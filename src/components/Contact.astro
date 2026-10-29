@@ -70,7 +70,6 @@ const hasEndpoint = Boolean(form.endpoint);
               {wa
                 ? <button class="btn btn--wa" type="submit" data-submit data-mode="wa"><Icon name="chat" /> <span data-label>Send on WhatsApp</span></button>
                 : <button class="btn btn--primary" type="submit" data-submit data-mode="email"><Icon name="mail" /> <span data-label>Send by email</span></button>}
-              {wa && <button class="btn" type="button" data-email-btn>Email instead <Icon name="mail" /></button>}
               <button class="btn" type="button" data-copy>Copy my message <Icon name="copy" /></button>
             </>
           )}
@@ -78,7 +77,7 @@ const hasEndpoint = Boolean(form.endpoint);
 
         {!hasEndpoint && (
           <p class="notice full" data-mode-note>
-            This form doesn’t send messages by itself. It opens {wa ? 'WhatsApp' : 'your email app'} with your enquiry filled in, and you press send there. No mail app? Use “Copy my message” and paste it anywhere.
+            This form doesn’t send messages by itself. It opens {wa ? 'WhatsApp' : 'your email app'} with your enquiry filled in, and you press send there. Prefer another app? Use “Copy my message” and paste it anywhere.
           </p>
         )}
         <p class="privacy full">Your details are only used to reply to your enquiry. Fields marked <span class="req">*</span> are required.</p>
@@ -272,12 +271,6 @@ const hasEndpoint = Boolean(form.endpoint);
     if (!validate()) return;
     track('WhatsApp click'); window.open(waUrl(), '_blank', 'noopener');
     say('WhatsApp should now open with your enquiry filled in. Press send there to deliver it. Nothing has been sent yet.', 'ok');
-  });
-  form.querySelector('[data-email-btn]')?.addEventListener('click', () => {
-    if (!validate()) return;
-    const { subject, body } = compose();
-    location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    say('Your email app should now open with your enquiry filled in. Press send there to deliver it. Nothing has been sent yet.', 'ok');
   });
   form.querySelector('[data-copy]')?.addEventListener('click', async () => {
     if (!validate()) return;
