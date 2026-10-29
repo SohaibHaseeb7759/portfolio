@@ -1,0 +1,33 @@
+---
+import { deliverables, supportPeriod } from '../data/content';
+import Icon from './Icon.astro';
+const items = [...deliverables, ...(supportPeriod ? [{ icon: 'wrench', title: `${supportPeriod} of free fixes after launch`, body: 'If something I built isn’t working as agreed, I’ll fix it.' }] : [])];
+---
+<section class="section deliver" id="deliverables" aria-labelledby="dl-h">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">What you get</p>
+      <h2 id="dl-h">What’s included in a typical project.</h2>
+      <p>The exact list is agreed before we start, based on your scope.</p>
+    </div>
+    <ul class="grid">
+      {items.map((d, i) => (
+        <li data-reveal style={`--delay:${i * 40}ms`}>
+          <span class="ico"><Icon name={d.icon} /></span>
+          <div><h3>{d.title}</h3><p>{d.body}</p></div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .grid { display: grid; gap: var(--s-4); }
+  li { display: flex; gap: var(--s-4); padding: var(--s-5); border: 1px solid var(--c-border); border-radius: var(--r-md); background: var(--c-surface-1); }
+  .ico { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: var(--c-blue-soft); color: var(--c-blue); }
+  .ico :global(svg) { width: 22px; height: 22px; }
+  h3 { font-size: var(--t-md); letter-spacing: -0.01em; margin-bottom: 4px; }
+  p { color: var(--c-text-2); font-size: var(--t-sm); }
+  @media (min-width: 700px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1040px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+</style>

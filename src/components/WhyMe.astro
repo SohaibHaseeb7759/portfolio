@@ -1,0 +1,36 @@
+---
+import { principles } from '../data/content';
+---
+<section class="section why" id="why" aria-labelledby="why-h">
+  <div class="container grid">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Why work with me</p>
+      <h2 id="why-h">Why should you trust me with your website?</h2>
+      <p>I can’t promise results I can’t control. Here is how I work, and what you can expect from me.</p>
+    </div>
+    <ul class="list">
+      {principles.map((p, i) => (
+        <li data-reveal style={`--delay:${i * 50}ms`}>
+          <h3>{p.title}</h3>
+          <p>{p.body}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .why { background: linear-gradient(var(--c-surface-1), var(--c-bg)); border-block: 1px solid var(--c-border); }
+  .grid { display: grid; gap: var(--s-6); }
+  .section-head { margin-bottom: 0; align-content: start; }
+  .list { display: grid; gap: 0; counter-reset: p; }
+  li { padding: var(--s-5) 0 var(--s-5) var(--s-7); border-bottom: 1px solid var(--c-border); position: relative; counter-increment: p; }
+  li:first-child { border-top: 1px solid var(--c-border); }
+  li::before { content: counter(p, decimal-leading-zero); position: absolute; left: 0; top: var(--s-5); font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-blue); line-height: 2.4; }
+  h3 { font-size: var(--t-md); letter-spacing: -0.01em; margin-bottom: var(--s-2); }
+  li p { color: var(--c-text-2); font-size: var(--t-sm); max-width: 52ch; }
+  @media (min-width: 960px) {
+    .grid { grid-template-columns: 5fr 6fr; gap: var(--s-9); }
+    .section-head { position: sticky; top: calc(var(--nav-h) + var(--s-6)); height: fit-content; }
+  }
+</style>

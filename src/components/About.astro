@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../assets/portrait.jpg';
+import { site } from '../data/site';
+const v = site.introVideo;
+---
+<section class="section" id="about" aria-labelledby="about-h">
+  <div class="container grid">
+    <figure class="portrait" data-reveal>
+      <Image src={portrait} alt="Portrait of Sohaib Haseeb" widths={[320, 480, 640]} sizes="(min-width: 900px) 380px, 80vw" loading="lazy" />
+      <figcaption>Sohaib Haseeb · Lahore</figcaption>
+    </figure>
+    <div class="text" data-reveal>
+      <p class="eyebrow">About me</p>
+      <h2 id="about-h">Hi, I’m Sohaib. I build websites and web apps.</h2>
+      <p>I’m a software engineer based in Lahore. By day I build websites and web applications as part of a development team, including CMS-powered sites that clients can edit themselves. I also work on applied AI, such as computer vision and speech. I take on freelance projects for businesses that want a site or tool they can be proud of.</p>
+      <p>I like practical problems: making information easy to find, making a form easy to fill in, making a clumsy process simpler. I care about the small details, like how a page reads on a phone, because that’s what your customers notice.</p>
+      <p>I’ll explain things in plain language, tell you honestly what I think will work, and keep you updated while I build.</p>
+      {v.src && (
+        <figure class="video">
+          <video controls preload="none" poster={v.poster || undefined} playsinline>
+            <source src={v.src} />
+            {v.captions && <track kind="captions" src={v.captions} srclang="en" label="English" default />}
+          </video>
+          <figcaption>A short hello from me</figcaption>
+        </figure>
+      )}
+      <p class="lang"><span class="chip" lang="ur">🇵🇰 اردو</span><span class="chip">English</span> <span>You can talk to me in Urdu or English, whichever you’re comfortable with.</span></p>
+      <svg class="sig" viewBox="0 0 260 64" role="img" aria-label="Signature: Sohaib Haseeb"><text x="4" y="46" font-family="'Segoe Script','Snell Roundhand','Brush Script MT','Lucida Handwriting',cursive" font-size="40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round">Sohaib Haseeb</text><path d="M6 56c40-6 120-8 240-2" fill="none" stroke="url(#sg)" stroke-width="2" stroke-linecap="round" /><defs><linearGradient id="sg"><stop offset="0" stop-color="#007fff" /><stop offset=".6" stop-color="#7b5cff" /><stop offset="1" stop-color="#ff3cac" /></linearGradient></defs></svg>
+      <div class="facts">
+        <div><span>Based in</span>Lahore, Pakistan</div>
+        <div><span>Languages</span>English, Urdu</div>
+        <div><span>Currently</span>Software engineer</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid { display: grid; gap: var(--s-7); align-items: center; }
+  .portrait { position: relative; max-width: 380px; width: 100%; margin: 0; }
+  .portrait :global(img) { width: 100%; height: auto; aspect-ratio: 4/5; object-fit: cover; object-position: center 20%; border-radius: var(--r-md); border: 1px solid var(--c-border-strong); filter: grayscale(0.15) contrast(1.02); }
+  .portrait::after { content: ''; position: absolute; inset: 14px -14px -14px 14px; border: 1px solid var(--c-blue-line); border-radius: var(--r-md); z-index: -1; }
+  figcaption { margin-top: var(--s-3); font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-text-3); text-transform: uppercase; letter-spacing: 0.1em; }
+  .text { display: grid; gap: var(--s-4); justify-items: start; }
+  h2 { font-size: var(--t-2xl); }
+  .text > p:not(.eyebrow) { color: var(--c-text-2); max-width: 54ch; }
+  .lang { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); font-size: var(--t-sm); color: var(--c-text-3); }
+  .lang .chip { font-family: var(--f-body); color: var(--c-text); background: var(--c-surface-1); padding: 4px 12px; border: 1px solid var(--c-border-strong); border-radius: var(--r-pill); }
+  .sig { width: 200px; color: var(--c-text-2); margin-top: var(--s-2); }
+  .video { margin: 0; width: 100%; max-width: 480px; }
+  .video video { width: 100%; border-radius: var(--r-md); border: 1px solid var(--c-border); background: #000; }
+  .video figcaption { margin-top: var(--s-2); }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--s-4); width: 100%; margin-top: var(--s-4); padding-top: var(--s-5); border-top: 1px solid var(--c-border); font-size: var(--t-sm); }
+  .facts span { display: block; font-family: var(--f-mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.1em; color: var(--c-text-3); margin-bottom: 2px; }
+  @media (min-width: 900px) { .grid { grid-template-columns: 380px 1fr; gap: var(--s-9); } }
+</style>

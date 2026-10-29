@@ -1,0 +1,55 @@
+---
+import { site, whatsappHref } from '../data/site';
+import Icon from './Icon.astro';
+const wa = whatsappHref();
+const tip = `Chat on WhatsApp${site.contact.responseTime ? `, usually replies within ${site.contact.responseTime}` : ''}`;
+---
+{wa && (
+  <div class="quick" data-quick data-wa={site.contact.whatsapp} inert>
+    <a class="quick__bar-wa btn btn--wa" href={wa} target="_blank" rel="noopener noreferrer" data-quick-wa data-track="WhatsApp click"><Icon name="chat" /> WhatsApp</a>
+    <a class="quick__bar-go btn btn--primary" href="#contact" data-track="Start a project (bar)">Start a project</a>
+    <a class="quick__fab" href={wa} target="_blank" rel="noopener noreferrer" aria-label={tip} data-quick-wa data-track="WhatsApp click">
+      <Icon name="chat" /><span class="quick__tip" aria-hidden="true">{tip}</span>
+    </a>
+  </div>
+)}
+
+<style>
+  .quick { position: fixed; z-index: 60; inset: auto 0 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); padding: var(--s-2) var(--s-3) calc(var(--s-2) + env(safe-area-inset-bottom)); background: var(--c-nav-bg); backdrop-filter: blur(14px); border-top: 1px solid var(--c-border); transform: translateY(110%); transition: transform var(--d-base) var(--ease-out); }
+  .quick.is-on { transform: none; }
+  .quick .btn { min-height: 48px; }
+  .quick__fab { display: none; }
+  @media (min-width: 860px) {
+    .quick { inset: auto var(--s-5) var(--s-5) auto; display: block; padding: 0; background: none; border: 0; backdrop-filter: none; transform: translateY(24px); opacity: 0; transition: transform var(--d-base) var(--ease-out), opacity var(--d-base); }
+    .quick.is-on { transform: none; opacity: 1; }
+    .quick__bar-wa, .quick__bar-go { display: none; }
+    .quick__fab { position: relative; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: #128c4a; color: #fff; box-shadow: 0 10px 30px -8px #128c4aaa; transition: transform var(--d-fast); }
+    .quick__fab:hover { transform: scale(1.06); }
+    .quick__fab :global(svg) { width: 26px; height: 26px; }
+    .quick__tip { position: absolute; right: 68px; top: 50%; transform: translateY(-50%); white-space: nowrap; font-size: var(--t-xs); background: var(--c-surface-3); color: var(--c-text); border: 1px solid var(--c-border-strong); padding: 6px 12px; border-radius: var(--r-sm); opacity: 0; pointer-events: none; transition: opacity var(--d-fast); }
+    .quick__fab:hover .quick__tip, .quick__fab:focus-visible .quick__tip { opacity: 1; }
+  }
+</style>
+
+<script>
+  const q = document.querySelector<HTMLElement>('[data-quick]');
+  if (q) {
+    const hero = document.getElementById('top')!;
+    const contact = document.getElementById('contact')!;
+    let heroGone = false; let inContact = false;
+    const sync = () => { const on = heroGone && !inContact; q.classList.toggle('is-on', on); q.toggleAttribute('inert', !on); };
+    new IntersectionObserver(([e]) => { heroGone = !e.isIntersecting; sync(); }, { threshold: 0.05 }).observe(hero);
+    new IntersectionObserver(([e]) => { inContact = e.isIntersecting; sync(); }, { threshold: 0.1 }).observe(contact);
+
+    // WhatsApp message mentions the section being viewed (and the business name typed in the hero)
+    let section = '';
+    const labels: Record<string, string> = { services: 'Services', work: 'Work', process: 'Process', about: 'About', packages: 'Packages', faq: 'FAQ', why: 'Why work with me', deliverables: 'What you get' };
+    const secs = Object.keys(labels).map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    secs.forEach((s) => new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) section = labels[s.id]; }), { rootMargin: '-45% 0px -50% 0px' }).observe(s));
+    q.querySelectorAll<HTMLAnchorElement>('[data-quick-wa]').forEach((a) => a.addEventListener('click', () => {
+      const biz = (window as any).__bizName;
+      const text = `Hi Sohaib, I was looking at your ${section ? section + ' section' : 'portfolio'}${biz ? ` and I run ${biz}` : ''}. I’d like to talk about a project.`;
+      a.href = `https://wa.me/${q.dataset.wa}?text=${encodeURIComponent(text)}`;
+    }));
+  }
+</script>

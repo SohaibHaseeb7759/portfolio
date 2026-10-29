@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, whatsappHref } from '../data/site';
+const base = import.meta.env.BASE_URL;
+const wa = whatsappHref('Hi Sohaib, I landed on a page that doesn’t exist on your portfolio.');
+---
+<Base title="Page not found | Sohaib Haseeb" noindex>
+  <main id="main" class="nf">
+    <p class="eyebrow">Error 404</p>
+    <h1>This page took a <span class="grad">wrong turn.</span></h1>
+    <p>The page you’re looking for doesn’t exist or has moved. Let’s get you back on track.</p>
+    <div class="row">
+      <a class="btn btn--primary" href={base}>Back to the homepage</a>
+      {wa && <a class="btn btn--wa" href={wa} target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>}
+    </div>
+    <p class="sig">{site.name}</p>
+  </main>
+</Base>
+
+<style>
+  .nf { min-height: 100dvh; display: grid; align-content: center; justify-items: start; gap: var(--s-5); padding: var(--s-8) var(--gutter); max-width: 52rem; margin-inline: auto; }
+  h1 { font-size: var(--t-hero); line-height: 1; }
+  p:not(.eyebrow):not(.sig) { color: var(--c-text-2); font-size: var(--t-md); max-width: 40ch; }
+  .row { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .sig { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-text-3); }
+</style>

@@ -1,0 +1,287 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { projects, alsoBuilt, categories } from '../data/content';
+import { whatsappHref } from '../data/site';
+import Icon from './Icon.astro';
+
+// Gallery for the lightbox: one large version of each project's main screenshot(s)
+const gallery: { src: string; alt: string; name: string; tall: boolean }[] = [];
+const firstIndex: Record<string, number> = {};
+for (const p of projects) {
+  const imgs = p.imageFull ? [p.imageFull] : [p.image, p.image2].filter(Boolean);
+  firstIndex[p.slug] = gallery.length;
+  for (const img of imgs) {
+    const big = await getImage({ src: img!, width: Math.min(img!.width, 1440), format: 'webp', quality: 80 });
+    gallery.push({ src: big.src, alt: p.imageAlt ?? p.name, name: p.name, tall: Boolean(p.imageFull) });
+  }
+}
+const used = new Set([...projects.map((p) => p.category), ...alsoBuilt.map((a) => a.category)]);
+const chips = categories.filter((c) => c.id === 'all' || used.has(c.id as any));
+---
+<section class="section" id="work" aria-labelledby="work-h">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Selected work</p>
+      <h2 id="work-h">Things I’ve built, and what they do.</h2>
+      <p>Each project is labelled honestly: live product, client website, personal or academic work.</p>
+    </div>
+
+    <div class="filters" role="group" aria-label="Filter projects" data-filters>
+      {chips.map((c, i) => <button type="button" class="chip" aria-pressed={i === 0 ? 'true' : 'false'} data-filter={c.id}>{c.label}</button>)}
+    </div>
+    <p class="sr-only" role="status" aria-live="polite" data-filter-status></p>
+
+    <div class="projects">
+      {projects.map((p) => {
+        const wa = whatsappHref(`Hi Sohaib, I saw your ${p.name} project on your portfolio and I’d like something similar.`);
+        return (
+        <article class="project" data-reveal data-category={p.category}>
+          <div class="project__media">
+            {p.image && p.shape === 'desktop' ? (
+              <div class="site" data-open={firstIndex[p.slug]}>
+                <div class="site__bar"><i></i><i></i><i></i><span>{p.live?.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span></div>
+                <div class="site__view" tabindex="0" role="group" aria-label={`Scrollable preview of ${p.name}`}>
+                  <Image src={(p.imageFull ?? p.image)!} alt={p.imageAlt ?? p.name} widths={[480, 800, 1200]} sizes="(min-width: 900px) 560px, 90vw" loading="lazy" />
+                </div>
+                <p class="site__hint" aria-hidden="true"><span class="hint-hover">Hover to scroll the page</span><span class="hint-touch">Swipe inside to scroll</span></p>
+                <button type="button" class="enlarge" data-lightbox={firstIndex[p.slug]} aria-label={`Enlarge screenshot of ${p.name}`}><Icon name="expand" /></button>
+              </div>
+            ) : p.image ? (
+              <div class="shots">
+                <Image src={p.image} alt={p.imageAlt ?? p.name} widths={[320, 480, 640]} sizes="(min-width: 900px) 260px, 60vw" loading="lazy" />
+                {p.image2 && <Image src={p.image2} alt="" widths={[320, 480]} sizes="(min-width: 900px) 200px, 45vw" loading="lazy" />}
+                <button type="button" class="enlarge" data-lightbox={firstIndex[p.slug]} aria-label={`Enlarge screenshots of ${p.name}`}><Icon name="expand" /></button>
+              </div>
+            ) : (
+              <div class="placeholder" role="img" aria-label={`Preview of ${p.name} coming soon`}>
+                <span>{p.name.split(' ')[0]}</span><small>Screenshot coming soon</small>
+              </div>
+            )}
+          </div>
+          <div class="project__body">
+            <p class="meta"><span class="tag">{p.kind}</span><span class="year">{p.year}</span></p>
+            <h3>{p.name}</h3>
+            {p.outcome && <p class="outcome">{p.outcome}</p>}
+            <p class="lead">{p.summary}</p>
+            <details>
+              <summary>Who it’s for, my part &amp; features</summary>
+              <dl>
+                <div><dt>Useful for</dt><dd>{p.forWho}</dd></div>
+                <div><dt>The problem</dt><dd>{p.problem}</dd></div>
+                <div><dt>My part</dt><dd>{p.contribution}</dd></div>
+              </dl>
+              <ul class="feat">{p.features.map((f) => <li>{f}</li>)}</ul>
+              <p class="tech"><span>Built with</span> {p.tech.join(' · ')}</p>
+            </details>
+            {p.copyright && <p class="copyright"><Icon name="info" /><span>{p.copyright}</span></p>}
+            {p.note && <p class="note">{p.note}</p>}
+            <div class="actions">
+              {p.live && <a class="btn btn--sm" href={p.live} target="_blank" rel="noopener noreferrer" data-track="Project visit">{p.liveLabel ?? 'Visit site'} <Icon name="external" /></a>}
+              {wa
+                ? <a class="btn btn--sm btn--ghost" href={wa} target="_blank" rel="noopener noreferrer" data-track="WhatsApp click">Want something like this? <Icon name="arrow" class="arrow" /></a>
+                : <a class="btn btn--sm btn--ghost" href="#contact">Want something like this? <Icon name="arrow" class="arrow" /></a>}
+            </div>
+          </div>
+        </article>
+      );})}
+    </div>
+
+    <div class="also" data-reveal data-also>
+      <h3>More projects I’ve worked on</h3>
+      <p>Live websites are company products built by teams I worked in; they belong to their owners. Projects without a link have no public demo.</p>
+      <ul>
+        {alsoBuilt.map((a) => (
+          <li data-category={a.category}>
+            {a.href ? (
+              <a href={a.href} target="_blank" rel="noopener noreferrer" data-track="Project visit"><strong>{a.name}</strong><span>{a.note}</span><em class="tag">{a.tag}</em><Icon name="external" /></a>
+            ) : (
+              <div class="row"><strong>{a.name}</strong><span>{a.note}</span><em class="tag">{a.tag}</em></div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+    <p class="cta" data-reveal>Like what you see? <a href="#contact">Tell me about your project →</a></p>
+  </div>
+
+  <dialog class="lb" aria-label="Screenshot viewer" data-lb>
+    <div class="lb__bar">
+      <p data-lb-caption></p>
+      <p class="lb__count" data-lb-count></p>
+      <button type="button" class="lb__btn" data-lb-close aria-label="Close viewer"><Icon name="close" /></button>
+    </div>
+    <div class="lb__stage" data-lb-stage tabindex="0">
+      <img alt="" data-lb-img />
+    </div>
+    <button type="button" class="lb__nav lb__prev" data-lb-prev aria-label="Previous screenshot"><Icon name="left" /></button>
+    <button type="button" class="lb__nav lb__next" data-lb-next aria-label="Next screenshot"><Icon name="right" /></button>
+  </dialog>
+  <script type="application/json" data-gallery set:html={JSON.stringify(gallery)} />
+</section>
+
+<style>
+  .filters { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-bottom: var(--s-7); }
+  .chip { min-height: 44px; padding: 0 var(--s-5); border: 1px solid var(--c-border-strong); border-radius: var(--r-pill); font-size: var(--t-sm); color: var(--c-text-2); transition: background-color var(--d-fast), border-color var(--d-fast), color var(--d-fast); }
+  .chip:hover { border-color: var(--c-text-3); color: var(--c-text); }
+  .chip[aria-pressed='true'] { background: var(--c-blue-soft); border-color: var(--c-blue); color: var(--c-text); }
+
+  .projects { display: grid; gap: var(--s-8); }
+  .project { display: grid; gap: var(--s-6); padding-top: var(--s-6); border-top: 1px solid var(--c-border); }
+  .project[hidden], .also li[hidden], .also[hidden] { display: none; }
+  .project__media { background: var(--c-surface-1); border: 1px solid var(--c-border); border-radius: var(--r-md); overflow: hidden; display: grid; place-items: center; min-height: 280px; padding: var(--s-5); position: relative; }
+  .project__media::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 120%, var(--c-glow), transparent 65%); pointer-events: none; }
+
+  .shots { display: flex; gap: var(--s-4); align-items: flex-end; position: relative; max-height: 420px; overflow: hidden; }
+  .shots :global(img) { width: min(46%, 220px); height: auto; border-radius: 22px; border: 5px solid var(--c-bezel); box-shadow: 0 30px 50px -25px #000; transition: transform var(--d-slow) var(--ease-out); }
+  .shots :global(img:nth-child(2)) { transform: translateY(24px); }
+  .project:hover .shots :global(img:first-child) { transform: translateY(-6px); }
+
+  .site { position: relative; width: 100%; border: 1px solid var(--c-border-strong); border-radius: var(--r-sm); overflow: hidden; background: var(--c-surface-2); box-shadow: 0 30px 50px -25px var(--c-shadow); }
+  .site__bar { display: flex; align-items: center; gap: 6px; padding: 9px 12px; background: var(--c-surface-2); border-bottom: 1px solid var(--c-border); }
+  .site__bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--c-border-strong); }
+  .site__bar span { margin-left: var(--s-3); font-family: var(--f-mono); font-size: 0.66rem; color: var(--c-text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .site__view { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--c-surface-3); }
+  .site__view :global(img) { position: absolute; left: 0; top: 0; width: 100%; height: auto; transition: top 8s linear, transform 8s linear; }
+  .site__hint { position: absolute; left: 12px; bottom: 10px; z-index: 2; font-family: var(--f-mono); font-size: 0.62rem; color: #fff; background: #000a; padding: 3px 9px; border-radius: var(--r-pill); pointer-events: none; backdrop-filter: blur(4px); transition: opacity var(--d-base); }
+  .hint-touch { display: none; }
+  .enlarge { position: absolute; right: 10px; bottom: 10px; z-index: 3; width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--r-sm); background: #000b; color: #fff; border: 1px solid #ffffff33; backdrop-filter: blur(4px); transition: background-color var(--d-fast), transform var(--d-fast); }
+  .enlarge:hover { background: var(--c-blue-fill); transform: scale(1.05); }
+  .shots .enlarge { right: 0; }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .site__view:hover :global(img), .project:focus-within .site__view :global(img) { top: 100%; transform: translateY(-100%); }
+    .site__view:hover ~ .site__hint, .project:focus-within .site__hint { opacity: 0; }
+    .site__view { cursor: zoom-in; }
+  }
+  @media (hover: none), (prefers-reduced-motion: reduce) {
+    .site__view { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+    .site__view :global(img) { position: static; transition: none; }
+    .hint-hover { display: none; }
+    .hint-touch { display: inline; }
+  }
+
+  .placeholder { position: relative; width: 100%; min-height: 260px; display: grid; place-content: center; text-align: center; gap: var(--s-2); border: 1px dashed var(--c-border-strong); border-radius: var(--r-sm); background: repeating-linear-gradient(135deg, transparent 0 14px, var(--c-hairline) 14px 15px); }
+  .placeholder span { font-family: var(--f-display); font-size: var(--t-2xl); font-weight: 600; letter-spacing: -0.03em; color: var(--c-text-2); }
+  .placeholder small { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-text-3); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  .project__body { display: grid; gap: var(--s-4); align-content: start; justify-items: start; }
+  .meta { display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; }
+  .year { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-text-3); }
+  h3 { font-size: var(--t-xl); }
+  .outcome { font-family: var(--f-display); font-size: var(--t-lg); line-height: 1.25; letter-spacing: -0.015em; color: var(--c-text); max-width: 30ch; text-wrap: balance; }
+  .lead { color: var(--c-text-2); max-width: 52ch; }
+  details { width: 100%; border-block: 1px solid var(--c-border); }
+  summary { cursor: pointer; font-size: var(--t-sm); color: var(--c-text-2); list-style: none; display: flex; justify-content: space-between; min-height: 48px; align-items: center; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; font-family: var(--f-mono); font-size: 1.2rem; transition: transform var(--d-base) var(--ease-out); }
+  details[open] summary::after { transform: rotate(45deg); }
+  summary:hover { color: var(--c-text); }
+  dl { display: grid; gap: var(--s-3); width: 100%; padding-bottom: var(--s-3); }
+  dl div { display: grid; gap: 2px; padding-top: var(--s-3); border-top: 1px solid var(--c-border); }
+  dt { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-text-3); text-transform: uppercase; letter-spacing: 0.1em; }
+  dd { margin: 0; color: var(--c-text-2); font-size: var(--t-sm); }
+  .feat { display: grid; gap: var(--s-2); font-size: var(--t-sm); color: var(--c-text-2); }
+  .feat li { padding-left: var(--s-5); position: relative; }
+  .feat li::before { content: ''; position: absolute; left: 0; top: 0.7em; width: 10px; height: 1px; background: var(--c-blue); }
+  .tech { margin: var(--s-3) 0; font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-text-3); }
+  .tech span { color: var(--c-text-2); }
+  .copyright { display: flex; gap: var(--s-2); align-items: flex-start; font-size: var(--t-xs); color: var(--c-text-3); line-height: 1.5; }
+  .copyright :global(svg) { flex: none; width: 14px; height: 14px; margin-top: 2px; }
+  .note { font-size: var(--t-xs); color: var(--c-text-3); }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
+  .btn--ghost { border-color: transparent; padding-inline: var(--s-2); color: var(--c-link); }
+
+  .also { margin-top: var(--s-9); padding: var(--s-6); border: 1px solid var(--c-border); border-radius: var(--r-md); background: var(--c-surface-1); display: grid; gap: var(--s-3); }
+  .also h3 { font-size: var(--t-lg); }
+  .also > p { color: var(--c-text-2); font-size: var(--t-sm); }
+  .also ul { display: grid; margin-top: var(--s-3); }
+  .also li a, .also .row { display: flex; align-items: center; gap: var(--s-4); padding: var(--s-3) 0; border-top: 1px solid var(--c-border); flex-wrap: wrap; }
+  .also li a { transition: padding var(--d-base) var(--ease-out); }
+  .also li a:hover { padding-left: var(--s-2); }
+  .also em { font-style: normal; }
+  .also li strong { font-family: var(--f-display); font-weight: 600; min-width: 8rem; }
+  .also li span { color: var(--c-text-3); font-size: var(--t-sm); flex: 1; min-width: 12rem; }
+  .also li :global(svg) { color: var(--c-text-3); }
+  .cta { margin-top: var(--s-6); color: var(--c-text-2); }
+  .cta a { color: var(--c-text); border-bottom: 1px solid var(--c-blue-line); }
+
+  /* Lightbox */
+  .lb { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; border: 0; background: var(--c-scrim); color: #fff; }
+  .lb[open] { display: grid; grid-template-rows: auto 1fr; }
+  .lb__bar { display: flex; align-items: center; gap: var(--s-4); padding: var(--s-2) var(--s-4); }
+  .lb__bar p:first-child { font-family: var(--f-display); font-weight: 600; margin-right: auto; }
+  .lb__count { font-family: var(--f-mono); font-size: var(--t-xs); color: #c9d0db; }
+  .lb__btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--r-sm); border: 1px solid #ffffff40; }
+  .lb__btn:hover { background: #ffffff22; }
+  .lb__stage { overflow: auto; display: grid; justify-items: center; align-items: start; padding: 0 var(--s-4) var(--s-6); touch-action: pan-y; outline-offset: -3px; }
+  .lb__stage img { max-width: min(100%, 1200px); height: auto; border-radius: var(--r-sm); background: #111; }
+  .lb__stage.is-phone img { max-height: calc(100dvh - 110px); width: auto; }
+  .lb__nav { position: fixed; top: 50%; width: 52px; height: 52px; margin-top: -26px; display: grid; place-items: center; border-radius: 50%; background: #000b; border: 1px solid #ffffff40; color: #fff; }
+  .lb__nav:hover { background: var(--c-blue-fill); }
+  .lb__prev { left: var(--s-3); } .lb__next { right: var(--s-3); }
+  .lb__nav[hidden] { display: none; }
+
+  @media (min-width: 900px) {
+    .project { grid-template-columns: 1fr 1fr; gap: var(--s-8); }
+    .project:nth-child(even) .project__media { order: 2; }
+    .project__media { min-height: 460px; }
+  }
+</style>
+
+<script>
+  // ---- Filter chips ----
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+  const items = [...document.querySelectorAll<HTMLElement>('.project[data-category], .also li[data-category]')];
+  const also = document.querySelector<HTMLElement>('[data-also]')!;
+  const status = document.querySelector<HTMLElement>('[data-filter-status]')!;
+  const apply = (f: string) => {
+    let shown = 0;
+    items.forEach((el) => { const on = f === 'all' || el.dataset.category === f; el.hidden = !on; if (on) shown++; });
+    also.hidden = ![...also.querySelectorAll('li')].some((li) => !li.hidden);
+    status.textContent = `Showing ${shown} project${shown === 1 ? '' : 's'}`;
+  };
+  chips.forEach((c) => c.addEventListener('click', () => {
+    chips.forEach((o) => o.setAttribute('aria-pressed', String(o === c)));
+    const go = () => apply(c.dataset.filter!);
+    const vt = (document as any).startViewTransition;
+    if (vt && !matchMedia('(prefers-reduced-motion: reduce)').matches) vt.call(document, go); else go();
+  }));
+
+  // ---- Lightbox ----
+  const dlg = document.querySelector<HTMLDialogElement>('[data-lb]')!;
+  const gallery: { src: string; alt: string; name: string; tall: boolean }[] = JSON.parse(document.querySelector('[data-gallery]')!.textContent!);
+  const img = dlg.querySelector<HTMLImageElement>('[data-lb-img]')!;
+  const stage = dlg.querySelector<HTMLElement>('[data-lb-stage]')!;
+  const cap = dlg.querySelector<HTMLElement>('[data-lb-caption]')!;
+  const count = dlg.querySelector<HTMLElement>('[data-lb-count]')!;
+  const prev = dlg.querySelector<HTMLButtonElement>('[data-lb-prev]')!;
+  const next = dlg.querySelector<HTMLButtonElement>('[data-lb-next]')!;
+  let i = 0; let opener: HTMLElement | null = null;
+  const show = (n: number) => {
+    i = (n + gallery.length) % gallery.length;
+    const g = gallery[i];
+    img.src = g.src; img.alt = g.alt; cap.textContent = g.name;
+    count.textContent = `${i + 1} / ${gallery.length}`;
+    stage.classList.toggle('is-phone', !g.tall); stage.scrollTop = 0;
+    prev.hidden = next.hidden = gallery.length < 2;
+  };
+  const open = (n: number, from: HTMLElement) => { opener = from; show(n); dlg.showModal(); stage.focus(); };
+  document.querySelectorAll<HTMLElement>('[data-lightbox]').forEach((b) => b.addEventListener('click', () => open(Number(b.dataset.lightbox), b)));
+  // On mouse devices a click on the page preview opens it too
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.querySelectorAll<HTMLElement>('.site__view').forEach((v) => v.addEventListener('click', () => {
+      const b = v.parentElement!.querySelector<HTMLElement>('[data-lightbox]')!; open(Number(b.dataset.lightbox), b);
+    }));
+  }
+  dlg.querySelector('[data-lb-close]')!.addEventListener('click', () => dlg.close());
+  prev.addEventListener('click', () => show(i - 1));
+  next.addEventListener('click', () => show(i + 1));
+  dlg.addEventListener('close', () => opener?.focus());
+  dlg.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') show(i - 1);
+    else if (e.key === 'ArrowRight') show(i + 1);
+  });
+  // swipe
+  let x0 = 0;
+  stage.addEventListener('pointerdown', (e) => (x0 = e.clientX));
+  stage.addEventListener('pointerup', (e) => { const dx = e.clientX - x0; if (Math.abs(dx) > 70) show(i + (dx < 0 ? 1 : -1)); });
+</script>

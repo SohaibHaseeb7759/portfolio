@@ -1,0 +1,107 @@
+---
+import { nav, site } from '../data/site';
+import Icon from './Icon.astro';
+---
+<header class="nav" data-nav>
+  <div class="nav__bar container">
+    <a href="#top" class="wordmark">
+      <span class="wordmark__mark">SH</span><span class="wordmark__text">Sohaib Haseeb</span><span class="sr-only">, back to top</span>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      {nav.map((l) => <a href={l.href}>{l.label}</a>)}
+    </nav>
+    <button class="nav__icon" type="button" aria-pressed="false" aria-label="Light theme" data-theme-toggle>
+      <Icon name="sun" class="i-sun" /><Icon name="moon" class="i-moon" />
+    </button>
+    <a href="#contact" class="btn btn--primary btn--sm nav__cta">Let’s Talk</a>
+    <button class="nav__toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" data-toggle>
+      <Icon name="menu" class="i-open" /><Icon name="close" class="i-close" />
+    </button>
+  </div>
+  <div class="nav__mobile" id="mobile-menu" data-menu hidden>
+    <nav class="container" aria-label="Mobile">
+      {nav.map((l) => <a href={l.href}>{l.label}</a>)}
+      <a href="#contact" class="btn btn--primary">Start a Project</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav { position: fixed; inset: 0 0 auto 0; z-index: 50; transition: background-color var(--d-base), border-color var(--d-base), backdrop-filter var(--d-base); border-bottom: 1px solid transparent; }
+  .nav.is-scrolled, .nav.is-open { background: var(--c-nav-bg); backdrop-filter: blur(14px); border-bottom-color: var(--c-border); }
+  .nav__bar { height: var(--nav-h); display: flex; align-items: center; gap: var(--s-6); }
+  .wordmark { display: inline-flex; align-items: center; gap: var(--s-3); font-family: var(--f-display); font-weight: 600; letter-spacing: -0.01em; margin-right: auto; }
+  .wordmark__mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--c-border-strong); font-size: 0.8rem; background: var(--g-signal); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav__links { display: none; gap: var(--s-6); }
+  .nav__links a { font-size: var(--t-sm); color: var(--c-text-2); transition: color var(--d-fast); position: relative; padding-block: 6px; }
+  .nav__links a:hover, .nav__links a.is-active { color: var(--c-text); }
+  .nav__links a.is-active::after { content: ''; position: absolute; inset: auto 0 0; height: 1px; background: var(--c-blue); }
+  .nav__cta { display: none; }
+  .nav__icon, .nav__toggle { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--c-border-strong); border-radius: var(--r-sm); transition: border-color var(--d-fast), background-color var(--d-fast); }
+  .nav__icon:hover, .nav__toggle:hover { border-color: var(--c-text-3); background: var(--c-surface-2); }
+  .nav__icon { margin-left: calc(-1 * var(--s-3)); }
+  .nav__icon :global(svg) { width: 18px; height: 18px; grid-area: 1/1; transition: opacity var(--d-fast), transform var(--d-base) var(--ease-out); }
+  :global([data-theme='dark']) .nav__icon :global(.i-sun), :global([data-theme='light']) .nav__icon :global(.i-moon) { opacity: 0; transform: rotate(-60deg) scale(0.6); }
+  .nav__toggle-old { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--c-border-strong); border-radius: var(--r-sm); }
+  .nav__toggle :global(svg) { width: 20px; height: 20px; grid-area: 1/1; transition: opacity var(--d-fast), transform var(--d-base) var(--ease-out); }
+  .nav__toggle :global(.i-close) { opacity: 0; transform: rotate(-45deg); }
+  .nav.is-open :global(.i-open) { opacity: 0; transform: rotate(45deg); }
+  .nav.is-open :global(.i-close) { opacity: 1; transform: none; }
+  .nav__mobile nav { display: grid; gap: var(--s-1); padding-block: var(--s-4) var(--s-6); }
+  .nav__mobile a:not(.btn) { font-family: var(--f-display); font-size: var(--t-lg); padding: var(--s-3) 0; border-bottom: 1px solid var(--c-border); }
+  .nav__mobile .btn { margin-top: var(--s-4); }
+  .nav__mobile[data-menu] { animation: drop var(--d-base) var(--ease-out); }
+  @keyframes drop { from { opacity: 0; transform: translateY(-8px); } }
+  @media (min-width: 860px) {
+    .nav__links, .nav__cta { display: flex; }
+    .nav__toggle, .nav__mobile { display: none !important; }
+    .nav__icon { margin-left: 0; }
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-nav]')!;
+  const toggle = nav.querySelector<HTMLButtonElement>('[data-toggle]')!;
+  const menu = nav.querySelector<HTMLElement>('[data-menu]')!;
+
+  const setOpen = (open: boolean) => {
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    menu.hidden = !open;
+    nav.classList.toggle('is-open', open);
+  };
+  toggle.addEventListener('click', () => setOpen(menu.hasAttribute('hidden')));
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !menu.hasAttribute('hidden')) { setOpen(false); toggle.focus(); }
+  });
+  matchMedia('(min-width: 860px)').addEventListener('change', (e) => e.matches && setOpen(false));
+
+  const themeBtn = nav.querySelector<HTMLButtonElement>('[data-theme-toggle]')!;
+  const syncTheme = () => {
+    const light = document.documentElement.dataset.theme === 'light';
+    themeBtn.setAttribute('aria-pressed', String(light));
+    themeBtn.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+    document.querySelector<HTMLMetaElement>('[data-theme-color]')!.content = light ? '#f7f8fa' : '#090b0f';
+  };
+  syncTheme();
+  themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch {}
+    syncTheme();
+  });
+
+  const onScroll = () => nav.classList.toggle('is-scrolled', scrollY > 12);
+  onScroll();
+  addEventListener('scroll', onScroll, { passive: true });
+
+  // Highlight the link for the section in view
+  const links = [...nav.querySelectorAll<HTMLAnchorElement>('.nav__links a')];
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (en.isIntersecting) links.forEach((l) => l.classList.toggle('is-active', l.getAttribute('href') === `#${en.target.id}`));
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  links.forEach((l) => { const s = document.querySelector(l.getAttribute('href')!); if (s) io.observe(s); });
+</script>

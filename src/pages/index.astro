@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Trust from '../components/Trust.astro';
+import Services from '../components/Services.astro';
+import Work from '../components/Work.astro';
+import Testimonials from '../components/Testimonials.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import WhyMe from '../components/WhyMe.astro';
+import Deliverables from '../components/Deliverables.astro';
+import Packages from '../components/Packages.astro';
+import Process from '../components/Process.astro';
+import About from '../components/About.astro';
+import Tech from '../components/Tech.astro';
+import FAQ from '../components/FAQ.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+import QuickContact from '../components/QuickContact.astro';
+import PageExtras from '../components/PageExtras.astro';
+import BookingDialog from '../components/BookingDialog.astro';
+---
+<Base>
+  <PageExtras />
+  <Nav />
+  <main id="main">
+    <Hero />
+    <Trust />
+    <Services />
+    <Work />
+    <Testimonials />
+    <BeforeAfter />
+    <WhyMe />
+    <Deliverables />
+    <Packages />
+    <Process />
+    <About />
+    <Tech />
+    <FAQ />
+    <Contact />
+  </main>
+  <Footer />
+  <QuickContact />
+  <BookingDialog />
+  <script>
+    // F1: content is never left invisible. Anything in view on load shows immediately;
+    // a short fallback timer reveals whatever is still hidden.
+    const els = [...document.querySelectorAll<HTMLElement>('[data-reveal]')];
+    const show = (e: Element) => e.classList.add('is-in');
+    const inView = (e: HTMLElement) => { const r = e.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; };
+    els.filter(inView).forEach(show);
+    if (!('IntersectionObserver' in window)) els.forEach(show);
+    else {
+      const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+        if (en.isIntersecting) { show(en.target); io.unobserve(en.target); }
+      }), { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+      els.forEach((e) => io.observe(e));
+    }
+    setTimeout(() => els.filter(inView).forEach(show), 1500);
+    addEventListener('beforeprint', () => els.forEach(show));
+  </script>
+</Base>

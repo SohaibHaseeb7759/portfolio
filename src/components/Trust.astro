@@ -1,0 +1,54 @@
+---
+import { site } from '../data/site';
+const { experience, highlights } = site;
+---
+{(experience.length > 0 || highlights.length > 0) && (
+  <section class="trust" aria-label="Experience and highlights">
+    <div class="container">
+      {highlights.length > 0 && (
+        <ul class="tiles">
+          {highlights.map((h) => (
+            <li data-reveal><strong data-count={h.value} data-suffix={h.suffix ?? ''}>{h.value}{h.suffix ?? ''}</strong><span>{h.label}</span></li>
+          ))}
+        </ul>
+      )}
+      {experience.length > 0 && (
+        <p class="exp" data-reveal>
+          <span class="exp__label">Experience building websites at</span>
+          {experience.map((e) => (
+            <span class="exp__item">{e.logo ? <img src={e.logo} alt={e.name} height="22" loading="lazy" /> : e.name}</span>
+          ))}
+          <span class="exp__note">Employers and teams I’ve worked with, not clients.</span>
+        </p>
+      )}
+    </div>
+  </section>
+)}
+
+<style>
+  .trust { border-block: 1px solid var(--c-border); background: var(--c-surface-1); padding-block: var(--s-6); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--s-5); padding-bottom: var(--s-6); margin-bottom: var(--s-6); border-bottom: 1px solid var(--c-border); }
+  .tiles strong { display: block; font-family: var(--f-display); font-size: var(--t-2xl); line-height: 1; letter-spacing: -0.03em; background: var(--g-signal); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tiles span { font-size: var(--t-sm); color: var(--c-text-2); }
+  .exp { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-6); }
+  .exp__label { font-family: var(--f-mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.1em; color: var(--c-text-3); }
+  .exp__item { font-family: var(--f-display); font-size: var(--t-md); font-weight: 600; color: var(--c-text-2); }
+  .exp__note { font-size: var(--t-xs); color: var(--c-text-3); }
+</style>
+
+<script>
+  const els = document.querySelectorAll<HTMLElement>('[data-count]');
+  if (els.length) {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      io.unobserve(en.target);
+      const el = en.target as HTMLElement; const to = Number(el.dataset.count); const suf = el.dataset.suffix ?? '';
+      if (reduce) return;
+      const t0 = performance.now();
+      const step = (t: number) => { const p = Math.min((t - t0) / 1100, 1); el.textContent = `${Math.round(to * (1 - Math.pow(1 - p, 3)))}${suf}`; if (p < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }), { threshold: 0.4 });
+    els.forEach((e) => io.observe(e));
+  }
+</script>

@@ -1,0 +1,103 @@
+---
+import '@fontsource-variable/space-grotesk';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import { site } from '../data/site';
+import { services, faqs } from '../data/content';
+
+const { title = site.title, description = site.description, noindex = false } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(`${base}${site.ogImage}`, Astro.site).href;
+const siteUrl = new URL(`${base}/`, Astro.site).href;
+const { analytics } = site;
+const sameAs = [site.social.github, site.social.linkedin].filter(Boolean);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'Person', '@id': `${siteUrl}#person`, name: site.name, jobTitle: 'Web developer', url: siteUrl, sameAs, address: { '@type': 'PostalAddress', addressLocality: 'Lahore', addressCountry: 'PK' } },
+    {
+      '@type': 'ProfessionalService', '@id': `${siteUrl}#service`, name: `${site.name}, web development`, url: siteUrl, founder: { '@id': `${siteUrl}#person` },
+      areaServed: ['Pakistan', 'United Arab Emirates', 'Worldwide'], description: site.description,
+      hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Services', itemListElement: services.map((s) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: s.title, description: s.body } })) },
+    },
+    { '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+  ],
+};
+---
+<!doctype html>
+<html lang="en" data-theme="dark" data-currency={site.currencies.default}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={site.name} />
+    <meta name="theme-color" content="#090b0f" data-theme-color />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="apple-touch-icon" sizes="180x180" href={`${base}/apple-touch-icon.png`} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Sohaib Haseeb, freelance web developer" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="sitemap" href={`${base}/sitemap-index.xml`} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      try {
+        var t = localStorage.getItem('theme');
+        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = t;
+        document.querySelector('[data-theme-color]').content = t === 'light' ? '#f7f8fa' : '#090b0f';
+        var c = localStorage.getItem('currency');
+        if (c && /^[A-Z]{3}$/.test(c)) document.documentElement.dataset.currency = c;
+      } catch (e) {}
+    </script>
+    {analytics.src && analytics.provider === 'plausible' && <script defer data-domain={analytics.domain} src={analytics.src}></script>}
+    {analytics.src && analytics.provider === 'umami' && <script defer data-website-id={analytics.domain} src={analytics.src}></script>}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
+    <noscript><style>.js [data-reveal]{opacity:1!important;transform:none!important}</style></noscript>
+    <script>
+      // Analytics events: any element with data-track="Event name", or a 'track' CustomEvent.
+      const send = (name: string) => {
+        const w = window as any;
+        try { if (w.plausible) w.plausible(name); else if (w.umami) w.umami.track(name); } catch {}
+      };
+      document.addEventListener('click', (e) => {
+        const el = (e.target as Element).closest('[data-track]');
+        if (el) send(el.getAttribute('data-track')!);
+      });
+      document.addEventListener('track', (e) => send((e as CustomEvent<string>).detail));
+
+      // Currency: window.setCurrency('USD') updates every price and the budget dropdown
+      (window as any).setCurrency = (code: string) => {
+        document.documentElement.dataset.currency = code;
+        try { localStorage.setItem('currency', code); } catch {}
+        document.dispatchEvent(new CustomEvent('currencychange', { detail: code }));
+      };
+
+      // Toast: document.dispatchEvent(new CustomEvent('toast', { detail: 'Copied' }))
+      const toast = document.querySelector<HTMLElement>('[data-toast]')!;
+      let timer: number;
+      document.addEventListener('toast', (e) => {
+        toast.textContent = (e as CustomEvent<string>).detail;
+        toast.classList.add('is-on');
+        clearTimeout(timer);
+        timer = window.setTimeout(() => toast.classList.remove('is-on'), 2600);
+      });
+    </script>
+  </body>
+</html>

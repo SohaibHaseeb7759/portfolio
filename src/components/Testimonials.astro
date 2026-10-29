@@ -1,0 +1,47 @@
+---
+import { testimonials, projects } from '../data/content';
+const [first, ...rest] = testimonials;
+const projName = (slug?: string) => projects.find((p) => p.slug === slug)?.name;
+---
+{first && (
+  <section class="section" id="testimonials" aria-labelledby="testi-h">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Kind words</p>
+        <h2 id="testi-h">What people say about working with me.</h2>
+      </div>
+      <figure class="feature" data-reveal>
+        <blockquote>“{first.quote}”</blockquote>
+        <figcaption>
+          {first.photo && <img src={first.photo} alt="" width="48" height="48" loading="lazy" />}
+          <span><strong>{first.name}</strong>{[first.role, first.company].filter(Boolean).join(', ') && <> · {[first.role, first.company].filter(Boolean).join(', ')}</>}
+            {projName(first.projectSlug) && <em> · {projName(first.projectSlug)}</em>}
+            {first.source && <> · <a href={first.source} target="_blank" rel="noopener noreferrer">Source</a></>}</span>
+        </figcaption>
+      </figure>
+      {rest.length > 0 && (
+        <ul class="cards">
+          {rest.map((t) => (
+            <li data-reveal>
+              <blockquote>“{t.quote}”</blockquote>
+              <p><strong>{t.name}</strong>{[t.role, t.company].filter(Boolean).length > 0 && <> · {[t.role, t.company].filter(Boolean).join(', ')}</>}{t.source && <> · <a href={t.source} target="_blank" rel="noopener noreferrer">Source</a></>}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+)}
+
+<style>
+  .feature { margin: 0; padding: clamp(var(--s-5), 4vw, var(--s-8)); border: 1px solid var(--c-border); border-radius: var(--r-md); background: linear-gradient(135deg, var(--c-blue-soft), transparent 60%), var(--c-surface-1); }
+  .feature blockquote { font-family: var(--f-display); font-size: var(--t-xl); line-height: 1.2; letter-spacing: -0.02em; max-width: 36ch; margin: 0 0 var(--s-5); text-wrap: balance; }
+  figcaption { display: flex; align-items: center; gap: var(--s-3); font-size: var(--t-sm); color: var(--c-text-2); }
+  figcaption img { border-radius: 50%; object-fit: cover; }
+  figcaption a, .cards a { text-decoration: underline; }
+  .cards { display: grid; gap: var(--s-4); margin-top: var(--s-4); }
+  .cards li { padding: var(--s-5); border: 1px solid var(--c-border); border-radius: var(--r-md); background: var(--c-surface-1); display: grid; gap: var(--s-3); }
+  .cards blockquote { margin: 0; color: var(--c-text); }
+  .cards p { font-size: var(--t-sm); color: var(--c-text-2); }
+  @media (min-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+</style>

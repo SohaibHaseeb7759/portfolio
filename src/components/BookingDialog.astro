@@ -1,0 +1,48 @@
+---
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+---
+{site.booking && (
+  <dialog class="book" aria-label={site.bookingLabel} data-book-dialog data-src={site.booking}>
+    <div class="book__bar">
+      <p>{site.bookingLabel}</p>
+      <button type="button" class="book__x" aria-label="Close booking window" data-book-close><Icon name="close" /></button>
+    </div>
+    <div class="book__frame" data-book-frame><p class="book__load">Loading calendar…</p></div>
+    <p class="book__alt">Calendar not loading? <a href={site.booking} target="_blank" rel="noopener noreferrer">Open it in a new tab</a>.</p>
+  </dialog>
+)}
+
+<style>
+  .book { width: min(720px, calc(100vw - 2rem)); height: min(760px, calc(100dvh - 2rem)); padding: 0; border: 1px solid var(--c-border-strong); border-radius: var(--r-md); background: var(--c-surface-1); color: var(--c-text); }
+  .book[open] { display: grid; grid-template-rows: auto 1fr auto; }
+  .book::backdrop { background: var(--c-scrim); }
+  .book__bar { display: flex; justify-content: space-between; align-items: center; padding: var(--s-2) var(--s-4); border-bottom: 1px solid var(--c-border); font-family: var(--f-display); font-weight: 600; }
+  .book__x { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--r-sm); }
+  .book__x:hover { background: var(--c-surface-2); }
+  .book__frame { min-height: 0; }
+  .book__frame :global(iframe) { width: 100%; height: 100%; border: 0; background: #fff; }
+  .book__load { padding: var(--s-6); color: var(--c-text-3); }
+  .book__alt { padding: var(--s-3) var(--s-4); font-size: var(--t-xs); color: var(--c-text-3); border-top: 1px solid var(--c-border); }
+  .book__alt a { text-decoration: underline; }
+</style>
+
+<script>
+  const dlg = document.querySelector<HTMLDialogElement>('[data-book-dialog]');
+  if (dlg) {
+    let opener: HTMLElement | null = null;
+    const frame = dlg.querySelector<HTMLElement>('[data-book-frame]')!;
+    document.querySelectorAll<HTMLElement>('[data-book]').forEach((b) => b.addEventListener('click', () => {
+      opener = b;
+      if (!frame.querySelector('iframe')) { // third-party content loads only on click
+        const f = document.createElement('iframe');
+        f.src = dlg.dataset.src!; f.title = 'Booking calendar'; f.loading = 'lazy';
+        frame.replaceChildren(f);
+      }
+      dlg.showModal();
+    }));
+    dlg.querySelector('[data-book-close]')!.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+    dlg.addEventListener('close', () => opener?.focus());
+  }
+</script>

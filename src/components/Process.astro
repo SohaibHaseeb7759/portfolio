@@ -1,0 +1,49 @@
+---
+import { steps } from '../data/content';
+---
+<section class="section" id="process" aria-labelledby="process-h">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">How it works</p>
+      <h2 id="process-h">From first message to launch, in four steps.</h2>
+      <p>You’ll always know what’s happening and what comes next.</p>
+    </div>
+    <ol class="timeline" data-fill>
+      {steps.map((s, i) => (
+        <li data-reveal style={`--delay:${i * 80}ms`}>
+          <span class="n" aria-hidden="true">{s.n}</span>
+          <div>
+            <h3><span class="sr-only">Step {s.n}: </span>{s.title}</h3>
+            <p>{s.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p class="fine" data-reveal>The exact process, deliverables, number of revisions and timeline depend on the scope we agree together.</p>
+  </div>
+</section>
+
+<style>
+  .timeline { display: grid; position: relative; padding-left: var(--s-7); }
+  .timeline::before { content: ''; position: absolute; left: 15px; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(var(--c-blue), var(--c-violet), var(--c-rose)); opacity: 0.6; }
+  .timeline::after { content: ''; position: absolute; left: 15px; top: 8px; bottom: 8px; width: 2px; margin-left: -0.5px; background: var(--c-blue); transform-origin: 50% 0; transform: scaleY(var(--fill, 1)); box-shadow: 0 0 12px var(--c-blue-line); }
+  li { position: relative; padding-bottom: var(--s-7); }
+  li:last-child { padding-bottom: 0; }
+  li::before { content: ''; position: absolute; left: calc(-1 * var(--s-7) + 11px); top: 14px; width: 9px; height: 9px; border-radius: 50%; background: var(--c-bg); border: 2px solid var(--c-blue); }
+  .n { font-family: var(--f-display); font-size: clamp(3.5rem, 9vw, 7rem); font-weight: 600; line-height: 0.9; letter-spacing: -0.05em; color: transparent; -webkit-text-stroke: 1px var(--c-border-strong); display: block; margin-bottom: var(--s-2); transition: -webkit-text-stroke-color var(--d-base); }
+  li:hover .n { -webkit-text-stroke-color: var(--c-blue); }
+  h3 { font-size: var(--t-xl); margin-bottom: var(--s-2); }
+  li p { color: var(--c-text-2); max-width: 44ch; }
+  .fine { margin-top: var(--s-7); color: var(--c-text-3); font-size: var(--t-sm); padding-top: var(--s-4); border-top: 1px solid var(--c-border); max-width: 60ch; }
+  @media (min-width: 900px) {
+    .timeline { padding: 0; grid-template-columns: repeat(4, 1fr); gap: var(--s-5); padding-top: var(--s-7); }
+    .timeline::before { left: 0; right: 0; top: 0; bottom: auto; width: auto; height: 1px; background: linear-gradient(90deg, var(--c-blue), var(--c-violet), var(--c-rose)); }
+    .timeline::after { left: 0; right: 0; top: 0; bottom: auto; width: auto; height: 2px; margin: 0; transform-origin: 0 50%; transform: scaleX(var(--fill, 1)); }
+    li { padding: 0; }
+    li::before { left: 0; top: calc(-1 * var(--s-7) - 4px); }
+    li:nth-child(even) { margin-top: var(--s-7); }
+    li:nth-child(even)::before { top: calc(-2 * var(--s-7) - 4px); }
+    .n { font-size: clamp(3rem, 5.5vw, 5.5rem); }
+    h3 { font-size: var(--t-lg); }
+  }
+</style>

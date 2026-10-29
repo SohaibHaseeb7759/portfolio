@@ -1,0 +1,292 @@
+---
+import { site, mailtoHref, whatsappHref } from '../data/site';
+import Icon from './Icon.astro';
+const { form, contact, currencies } = site;
+const wa = whatsappHref();
+const hasEndpoint = Boolean(form.endpoint);
+---
+<section class="section contact" id="contact" aria-labelledby="contact-h">
+  <div class="container grid">
+    <div class="intro" data-reveal>
+      <p class="eyebrow">Start a project</p>
+      <h2 id="contact-h">Have a project in mind?</h2>
+      <p>Not sure about the technical details? That’s fine. Tell me about your business and what you’d like to achieve, in your own words, and I’ll reply to talk through it. No obligation.</p>
+      <ul class="direct">
+        {wa && <li><a href={wa} target="_blank" rel="noopener noreferrer" data-track="WhatsApp click"><Icon name="chat" /> WhatsApp {contact.phoneDisplay}</a></li>}
+        {contact.email && <li><a href={mailtoHref()}><Icon name="mail" /> {contact.email}</a></li>}
+        {site.social.linkedin && <li><a href={site.social.linkedin} target="_blank" rel="noopener noreferrer"><Icon name="linkedin" /> LinkedIn</a></li>}
+        {site.booking && <li><button type="button" class="direct__btn" data-book data-track="Booking click"><Icon name="calendar" /> {site.bookingLabel}</button></li>}
+      </ul>
+    </div>
+
+    <div class="panel" data-reveal>
+      <form class="form" novalidate data-form data-endpoint={form.endpoint} data-email={contact.email} data-whatsapp={contact.whatsapp} data-honeypot={form.honeypotField} data-response={contact.responseTime} data-extra={JSON.stringify(form.extraFields)} data-budgets={JSON.stringify(currencies.budgets)}>
+        <div class="field">
+          <label for="f-name">Your name <span class="req" aria-hidden="true">*</span></label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required aria-describedby="e-name" />
+          <p class="err" id="e-name" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="f-email">Email <span class="req" aria-hidden="true">*</span></label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required aria-describedby="e-email" />
+          <p class="err" id="e-email" role="alert"></p>
+        </div>
+        <div class="field full">
+          <label for="f-biz">Business or organization <span class="opt">optional</span></label>
+          <input id="f-biz" name="business" type="text" autocomplete="organization" />
+        </div>
+        <div class="field">
+          <label for="f-service">What do you need? <span class="req" aria-hidden="true">*</span></label>
+          <select id="f-service" name="service" required aria-describedby="e-service">
+            <option value="">Choose one…</option>
+            {form.services.map((s) => <option>{s}</option>)}
+          </select>
+          <p class="err" id="e-service" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="f-budget">Estimated budget <span class="opt">optional</span></label>
+          <div class="budget">
+            <select id="f-budget" name="budget" data-budget><option value="">Choose one…</option></select>
+            <select id="f-cur" aria-label="Currency" data-cur-select>
+              {currencies.list.map((c) => <option value={c.code}>{c.code}</option>)}
+            </select>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="f-msg">Tell me about your project <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="f-msg" name="message" rows="5" required minlength="15" aria-describedby="e-msg" placeholder="What does your business do? What would you like your website to help with?"></textarea>
+          <p class="err" id="e-msg" role="alert"></p>
+        </div>
+        <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name={form.honeypotField} tabindex="-1" autocomplete="off" /></label></div>
+
+        <div class="full actions">
+          {hasEndpoint ? (
+            <>
+              <button class="btn btn--primary" type="submit" data-submit><span data-label>Send enquiry</span> <Icon name="arrow" class="arrow" /></button>
+              {wa && <button class="btn btn--wa" type="button" data-wa>WhatsApp instead <Icon name="chat" /></button>}
+            </>
+          ) : (
+            <>
+              {wa
+                ? <button class="btn btn--wa" type="submit" data-submit data-mode="wa"><Icon name="chat" /> <span data-label>Send on WhatsApp</span></button>
+                : <button class="btn btn--primary" type="submit" data-submit data-mode="email"><Icon name="mail" /> <span data-label>Send by email</span></button>}
+              {wa && <button class="btn" type="button" data-email-btn>Email instead <Icon name="mail" /></button>}
+              <button class="btn" type="button" data-copy>Copy my message <Icon name="copy" /></button>
+            </>
+          )}
+        </div>
+
+        {!hasEndpoint && (
+          <p class="notice full" data-mode-note>
+            This form doesn’t send messages by itself. It opens {wa ? 'WhatsApp' : 'your email app'} with your enquiry filled in, and you press send there. No mail app? Use “Copy my message” and paste it anywhere.
+          </p>
+        )}
+        <p class="privacy full">Your details are only used to reply to your enquiry. Fields marked <span class="req">*</span> are required.</p>
+        <div class="status full" role="status" aria-live="polite" data-status></div>
+        <noscript><p class="notice full">JavaScript is off. Please reach me directly: {wa && <a href={wa}>WhatsApp</a>}{wa && contact.email && ' or '}{contact.email && <a href={mailtoHref()}>{contact.email}</a>}.</p></noscript>
+      </form>
+
+      <div class="done" data-done hidden tabindex="-1">
+        <svg class="done__check" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="2" /><path d="M15 27l8 8 14-16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <h3 data-done-title>Thanks!</h3>
+        <p data-done-sub></p>
+        <ol class="next">
+          <li>I read your message and check anything that needs clarifying.</li>
+          <li>I reply by email{wa ? ' (or WhatsApp)' : ''} to set up a short chat.</li>
+          <li>After we talk, I send a clear scope and quote. No obligation.</li>
+        </ol>
+        <button type="button" class="btn" data-again>Send another message</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact { border-top: 1px solid var(--c-border); background: radial-gradient(ellipse 60% 50% at 80% 0%, var(--c-glow), transparent 70%); }
+  .grid { display: grid; gap: var(--s-7); }
+  .intro { display: grid; gap: var(--s-4); align-content: start; justify-items: start; }
+  .intro h2 { font-size: var(--t-2xl); }
+  .intro > p:not(.eyebrow) { color: var(--c-text-2); font-size: var(--t-md); max-width: 44ch; }
+  .direct { display: grid; gap: var(--s-1); margin-top: var(--s-4); width: 100%; }
+  .direct a, .direct__btn { display: inline-flex; gap: var(--s-3); align-items: center; width: 100%; min-height: 48px; border-bottom: 1px solid var(--c-border); color: var(--c-text-2); transition: color var(--d-fast), border-color var(--d-fast); word-break: break-all; text-align: left; }
+  .direct a:hover, .direct__btn:hover { color: var(--c-text); border-color: var(--c-blue); }
+
+  .form { display: grid; gap: var(--s-5); padding: clamp(var(--s-5), 4vw, var(--s-7)); border: 1px solid var(--c-border); border-radius: var(--r-md); background: var(--c-surface-1); }
+  .field { display: grid; gap: var(--s-2); align-content: start; min-width: 0; }
+  label { font-size: var(--t-sm); font-weight: 500; }
+  .req { color: var(--c-rose-text); }
+  .opt { color: var(--c-text-3); font-family: var(--f-mono); font-size: var(--t-xs); margin-left: var(--s-2); }
+  input:not([type='checkbox']), select, textarea { width: 100%; min-height: 48px; padding: var(--s-3) var(--s-4); background: var(--c-bg); border: 1px solid var(--c-border-strong); border-radius: var(--r-sm); transition: border-color var(--d-fast), box-shadow var(--d-fast); }
+  textarea { resize: vertical; min-height: 140px; }
+  input::placeholder, textarea::placeholder { color: var(--c-text-3); }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: var(--c-blue); box-shadow: 0 0 0 3px var(--c-blue-soft); }
+  [aria-invalid='true'] { border-color: var(--c-rose); }
+  .budget { display: grid; grid-template-columns: 1fr 5.5rem; gap: var(--s-2); }
+  .err { color: var(--c-rose-text); font-size: var(--t-xs); }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .notice { font-size: var(--t-sm); color: var(--c-text-2); padding: var(--s-3) var(--s-4); border-left: 2px solid var(--c-blue); background: var(--c-blue-soft); border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+  .notice a { text-decoration: underline; }
+  .privacy { font-size: var(--t-xs); color: var(--c-text-3); }
+  .status:empty { display: none; }
+  .status { padding: var(--s-3) var(--s-4); border-radius: var(--r-sm); border: 1px solid var(--c-border-strong); font-size: var(--t-sm); }
+  .status.ok { border-color: var(--c-green-line); color: var(--c-green-text); }
+  .status.bad { border-color: var(--c-rose); color: var(--c-rose-text); }
+  [data-submit][disabled] { opacity: 0.6; cursor: progress; }
+  :global(html:not(.js)) .actions { display: none; }
+
+  .done { display: grid; gap: var(--s-4); justify-items: start; padding: clamp(var(--s-5), 4vw, var(--s-7)); border: 1px solid var(--c-green-line); border-radius: var(--r-md); background: var(--c-surface-1); outline: none; }
+  .done[hidden] { display: none; }
+  .done__check { width: 64px; height: 64px; color: var(--c-green-line); }
+  .done__check circle { stroke-dasharray: 160; stroke-dashoffset: 160; animation: draw 0.7s var(--ease-out) forwards; }
+  .done__check path { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw 0.5s var(--ease-out) 0.5s forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .done h3 { font-size: var(--t-xl); }
+  .done p { color: var(--c-text-2); max-width: 46ch; }
+  .next { display: grid; gap: var(--s-3); counter-reset: n; margin-block: var(--s-2); }
+  .next li { counter-increment: n; display: flex; gap: var(--s-3); color: var(--c-text-2); font-size: var(--t-sm); }
+  .next li::before { content: counter(n); flex: none; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: var(--c-blue-soft); color: var(--c-link); font-family: var(--f-mono); font-size: var(--t-xs); }
+
+  @media (min-width: 640px) { .form { grid-template-columns: 1fr 1fr; } .full { grid-column: 1 / -1; } }
+  @media (max-width: 639px) { .actions .btn { width: 100%; } }
+  @media (min-width: 960px) { .grid { grid-template-columns: 5fr 7fr; gap: var(--s-9); } }
+  @media (prefers-reduced-motion: reduce) { .done__check circle, .done__check path { animation: none; stroke-dashoffset: 0; } }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-form]')!;
+  const done = document.querySelector<HTMLElement>('[data-done]')!;
+  const status = form.querySelector<HTMLElement>('[data-status]')!;
+  const submitBtn = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+  const label = submitBtn.querySelector<HTMLElement>('[data-label]')!;
+  const { endpoint, email, whatsapp, honeypot, response } = form.dataset;
+  const budgets: Record<string, string[]> = JSON.parse(form.dataset.budgets!);
+  const extra: Record<string, string> = JSON.parse(form.dataset.extra!);
+  const track = (n: string) => document.dispatchEvent(new CustomEvent('track', { detail: n }));
+
+  // --- currency-aware budget dropdown ---
+  const budgetSel = form.querySelector<HTMLSelectElement>('[data-budget]')!;
+  const curSel = form.querySelector<HTMLSelectElement>('[data-cur-select]')!;
+  const fillBudgets = () => {
+    const code = document.documentElement.dataset.currency || curSel.value;
+    curSel.value = code;
+    const keep = budgetSel.selectedIndex;
+    budgetSel.replaceChildren(new Option('Choose one…', ''), ...(budgets[code] ?? []).map((b) => new Option(b, b)));
+    budgetSel.selectedIndex = Math.min(keep, budgetSel.options.length - 1);
+  };
+  fillBudgets();
+  document.addEventListener('currencychange', fillBudgets);
+  curSel.addEventListener('change', () => (window as any).setCurrency(curSel.value));
+
+  // --- prefill from hero preview and service picks ---
+  const bizInput = form.elements.namedItem('business') as HTMLInputElement;
+  const serviceSel = form.elements.namedItem('service') as HTMLSelectElement;
+  const setBiz = (v: string) => { if (v && (!bizInput.value || bizInput.dataset.auto === '1')) { bizInput.value = v; bizInput.dataset.auto = '1'; } };
+  bizInput.addEventListener('input', () => (bizInput.dataset.auto = '0'));
+  setBiz((window as any).__bizName || '');
+  document.addEventListener('bizname', (e) => setBiz((e as CustomEvent<string>).detail));
+  const setService = (v: string) => { if ([...serviceSel.options].some((o) => o.value === v || o.text === v)) serviceSel.value = v; };
+  setService((window as any).__service || '');
+  document.addEventListener('preselect', (e) => setService((e as CustomEvent<string>).detail));
+
+  // --- validation ---
+  type Field = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+  const rules: Record<string, (v: string) => string> = {
+    name: (v) => (v.trim().length < 2 ? 'Please enter your name.' : ''),
+    email: (v) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) ? '' : 'Please enter a valid email address, like name@example.com.'),
+    service: (v) => (v ? '' : 'Please choose what you need.'),
+    message: (v) => (v.trim().length < 15 ? 'Please add a few more words (at least 15 characters) so I understand your project.' : ''),
+  };
+  const check = (f: Field) => {
+    const msg = rules[f.name]?.(f.value) ?? '';
+    const out = form.querySelector<HTMLElement>(`#e-${f.id.replace('f-', '')}`);
+    if (out) out.textContent = msg;
+    f.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    return !msg;
+  };
+  const fields = Object.keys(rules).map((n) => form.elements.namedItem(n) as Field);
+  fields.forEach((f) => {
+    f.addEventListener('blur', () => check(f));
+    f.addEventListener('input', () => f.getAttribute('aria-invalid') === 'true' && check(f));
+  });
+  const validate = () => {
+    const bad = fields.filter((f) => !check(f));
+    bad[0]?.focus();
+    if (bad.length) say('Please fix the highlighted fields and try again.', 'bad');
+    return bad.length === 0;
+  };
+  const say = (msg: string, kind: 'ok' | 'bad' | '') => { status.textContent = msg; status.className = `status full ${kind}`; };
+
+  const compose = () => {
+    const d = new FormData(form);
+    const lines = [
+      `Name: ${d.get('name')}`, `Email: ${d.get('email')}`,
+      d.get('business') ? `Business: ${d.get('business')}` : '',
+      `Needs: ${d.get('service')}`, d.get('budget') ? `Budget: ${d.get('budget')}` : '',
+    ].filter(Boolean);
+    return { subject: `Project enquiry: ${d.get('service')}`, body: `${lines.join('\n')}\n\n${d.get('message')}` };
+  };
+  const waUrl = () => `https://wa.me/${whatsapp}?text=${encodeURIComponent(`Hi Sohaib,\n\n${compose().body}`)}`;
+  const toast = (m: string) => document.dispatchEvent(new CustomEvent('toast', { detail: m }));
+
+  const showDone = () => {
+    const name = String(new FormData(form).get('name') || '').trim().split(' ')[0];
+    done.querySelector('[data-done-title]')!.textContent = `Thanks, ${name}!`;
+    done.querySelector('[data-done-sub]')!.textContent = response ? `I usually reply within ${response}.` : 'I’ll reply by email as soon as I can.';
+    form.hidden = true; done.hidden = false; done.focus();
+    form.reset(); fillBudgets();
+  };
+  done.querySelector('[data-again]')!.addEventListener('click', () => { done.hidden = true; form.hidden = false; say('', ''); (form.elements.namedItem('name') as HTMLElement).focus(); });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    const data = new FormData(form);
+    if (honeypot && data.get(honeypot)) { showDone(); return; } // bot: pretend success
+    if (endpoint) {
+      submitBtn.disabled = true; label.textContent = 'Sending…';
+      try {
+        data.delete(honeypot!);
+        Object.entries(extra).forEach(([k, v]) => data.append(k, v));
+        const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+        track('Form submit'); showDone();
+      } catch {
+        say(`Sorry, something went wrong sending your enquiry. Please message me on WhatsApp or email ${email}.`, 'bad');
+      } finally { submitBtn.disabled = false; label.textContent = 'Send enquiry'; }
+      return;
+    }
+    // No backend: WhatsApp is the main path (email if no WhatsApp number is configured)
+    track('Form submit');
+    if (!whatsapp) {
+      const { subject, body } = compose();
+      location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      say('Your email app should now open with your enquiry filled in. Press send there to deliver it. Nothing has been sent yet.', 'ok');
+      return;
+    }
+    window.open(waUrl(), '_blank', 'noopener');
+    say('WhatsApp should now open with your enquiry filled in. Press send there to deliver it. Nothing has been sent yet.', 'ok');
+  });
+
+  form.querySelector('[data-wa]')?.addEventListener('click', () => {
+    if (!validate()) return;
+    track('WhatsApp click'); window.open(waUrl(), '_blank', 'noopener');
+    say('WhatsApp should now open with your enquiry filled in. Press send there to deliver it. Nothing has been sent yet.', 'ok');
+  });
+  form.querySelector('[data-email-btn]')?.addEventListener('click', () => {
+    if (!validate()) return;
+    const { subject, body } = compose();
+    location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    say('Your email app should now open with your enquiry filled in. Press send there to deliver it. Nothing has been sent yet.', 'ok');
+  });
+  form.querySelector('[data-copy]')?.addEventListener('click', async () => {
+    if (!validate()) return;
+    const text = `To: ${email}\nSubject: ${compose().subject}\n\n${compose().body}`;
+    try { await navigator.clipboard.writeText(text); toast('Message copied. Paste it into any app.'); say('Message copied. Paste it into WhatsApp, email or any chat. Nothing has been sent yet.', 'ok'); }
+    catch {
+      const ta = document.createElement('textarea'); ta.value = text; document.body.append(ta); ta.select();
+      try { (document as any).execCommand('copy'); toast('Message copied. Paste it into any app.'); } catch { toast('Could not copy. Please select the text manually.'); }
+      ta.remove();
+    }
+  });
+</script>

@@ -1,0 +1,157 @@
+---
+import { services, quiz, serviceFormMap } from '../data/content';
+import Icon from './Icon.astro';
+const icons: Record<string, string> = { business: 'layout', landing: 'target', cms: 'edit', app: 'app', ai: 'ai', improve: 'wrench' };
+---
+<section class="section" id="services" aria-labelledby="services-h">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">What I can do for you</p>
+      <h2 id="services-h">Ways I can help your business.</h2>
+      <p>Tell me the problem you’re trying to solve. I’ll suggest the simplest thing that solves it.</p>
+    </div>
+
+    <ul class="grid">
+      {services.map((s, i) => (
+        <li data-reveal style={`--delay:${i * 50}ms`}>
+          <details class="card" data-tilt>
+            <summary>
+              <span class="ico"><Icon name={icons[s.id]} /></span>
+              <h3>{s.title}</h3>
+              <p class="problem"><strong>{s.problem}</strong></p>
+              <p class="best"><span>Best for</span> {s.bestFor}</p>
+              <span class="more" aria-hidden="true">Details <Icon name="plus" /></span>
+            </summary>
+            <div class="body">
+              <p>{s.body}</p>
+              <ul>{s.points.map((p) => <li>{p}</li>)}</ul>
+              <a href="#contact" class="link" data-service={s.id}>Ask about this <Icon name="arrow" class="arrow" /></a>
+            </div>
+          </details>
+        </li>
+      ))}
+    </ul>
+
+    <div class="quiz" data-quiz data-reveal data-map={JSON.stringify(serviceFormMap)} data-order={JSON.stringify(services.map((s) => s.id))} data-titles={JSON.stringify(Object.fromEntries(services.map((s) => [s.id, s.title])))}>
+      <div class="quiz__head">
+        <p class="eyebrow">Not sure?</p>
+        <h3>Which one do I need?</h3>
+        <p>Three quick questions. Nothing is sent anywhere.</p>
+      </div>
+      <div class="quiz__body">
+        <p class="quiz__step" data-step aria-hidden="true"></p>
+        {quiz.map((step, i) => (
+          <fieldset class="q" data-q={i} hidden={i !== 0}>
+            <legend>{step.q}</legend>
+            <div class="opts">
+              {step.options.map((o) => (
+                <button type="button" class="opt" data-votes={o.votes.join(',')}>{o.label}</button>
+              ))}
+            </div>
+          </fieldset>
+        ))}
+        <div class="result" data-result hidden tabindex="-1">
+          <p class="result__label">I’d suggest</p>
+          <p class="result__name" data-result-name></p>
+          <p class="result__body" data-result-body></p>
+          <div class="result__cta">
+            <a href="#contact" class="btn btn--primary" data-result-go data-track="Quiz completed">Tell me about my project <Icon name="arrow" class="arrow" /></a>
+            <button type="button" class="btn" data-restart>Start again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid { display: grid; gap: var(--s-4); align-items: start; }
+  .card { border: 1px solid var(--c-border); border-radius: var(--r-md); background: var(--c-surface-1); transition: border-color var(--d-base), transform var(--d-base) var(--ease-out), background-color var(--d-base); transform-style: preserve-3d; }
+  .card:hover, .card[open] { border-color: var(--c-border-strong); }
+  summary { list-style: none; cursor: pointer; display: grid; gap: var(--s-3); padding: var(--s-5); position: relative; }
+  summary::-webkit-details-marker { display: none; }
+  .ico { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 12px; background: var(--c-blue-soft); color: var(--c-blue); border: 1px solid var(--c-blue-line); }
+  .ico :global(svg) { width: 24px; height: 24px; }
+  h3 { font-size: var(--t-lg); line-height: 1.15; }
+  .problem { color: var(--c-text); font-size: var(--t-sm); line-height: 1.5; }
+  .problem strong { font-weight: 600; }
+  .best { font-size: var(--t-xs); color: var(--c-text-3); }
+  .best span { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: 0.08em; margin-right: 4px; color: var(--c-text-2); }
+  .more { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-sm); color: var(--c-link); min-height: 32px; }
+  .more :global(svg) { transition: transform var(--d-base) var(--ease-out); }
+  .card[open] .more :global(svg) { transform: rotate(45deg); }
+  .body { padding: 0 var(--s-5) var(--s-5); display: grid; gap: var(--s-4); color: var(--c-text-2); font-size: var(--t-sm); }
+  .body ul { display: grid; gap: var(--s-2); }
+  .body li { padding-left: var(--s-5); position: relative; }
+  .body li::before { content: ''; position: absolute; left: 0; top: 0.7em; width: 10px; height: 1px; background: var(--c-blue); }
+  .link { color: var(--c-text); font-weight: 600; display: inline-flex; gap: 6px; align-items: center; min-height: 44px; }
+  .link :global(svg) { transition: transform var(--d-base) var(--ease-out); }
+  .link:hover :global(svg) { transform: translateX(3px); }
+
+  .quiz { margin-top: var(--s-8); display: grid; gap: var(--s-6); padding: clamp(var(--s-5), 4vw, var(--s-7)); border: 1px solid var(--c-border); border-radius: var(--r-md); background: linear-gradient(135deg, var(--c-blue-soft), transparent 60%), var(--c-surface-1); }
+  .quiz__head { display: grid; gap: var(--s-3); align-content: start; }
+  .quiz__head h3 { font-size: var(--t-xl); }
+  .quiz__head > p:last-child { color: var(--c-text-2); }
+  .quiz__step { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-text-3); margin-bottom: var(--s-3); }
+  fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+  legend { font-family: var(--f-display); font-size: var(--t-md); font-weight: 600; margin-bottom: var(--s-4); padding: 0; }
+  .opts { display: grid; gap: var(--s-3); }
+  .opt { min-height: 52px; padding: var(--s-3) var(--s-4); text-align: left; border: 1px solid var(--c-border-strong); border-radius: var(--r-sm); background: var(--c-bg); transition: border-color var(--d-fast), background-color var(--d-fast), transform var(--d-fast); }
+  .opt:hover { border-color: var(--c-blue); background: var(--c-blue-soft); }
+  .opt:active { transform: scale(0.99); }
+  .result { display: grid; gap: var(--s-3); outline: none; }
+  .result__label { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--c-text-3); text-transform: uppercase; letter-spacing: 0.1em; }
+  .result__name { font-family: var(--f-display); font-size: var(--t-xl); font-weight: 600; line-height: 1.1; }
+  .result__body { color: var(--c-text-2); max-width: 48ch; }
+  .result__cta { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-3); }
+
+  @media (min-width: 700px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1040px) { .grid { grid-template-columns: repeat(3, 1fr); } .quiz { grid-template-columns: 4fr 6fr; gap: var(--s-8); } }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) { .card:hover { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); } }
+</style>
+
+<script>
+  // "Ask about this" and quiz results pre-select the matching service in the form
+  const preselect = (id: string, map: Record<string, string>) => {
+    (window as any).__service = map[id] ?? '';
+    document.dispatchEvent(new CustomEvent('preselect', { detail: map[id] ?? '' }));
+  };
+  const quiz = document.querySelector<HTMLElement>('[data-quiz]')!;
+  const map: Record<string, string> = JSON.parse(quiz.dataset.map!);
+  const order: string[] = JSON.parse(quiz.dataset.order!);
+  const titles: Record<string, string> = JSON.parse(quiz.dataset.titles!);
+  document.querySelectorAll<HTMLElement>('[data-service]').forEach((a) => a.addEventListener('click', () => preselect(a.dataset.service!, map)));
+
+  const blurbs: Record<string, string> = {
+    business: 'A professional multi-page site showing your services and how to reach you.',
+    landing: 'One focused page built around a single offer and a single next step.',
+    cms: 'A site with an admin screen so you can change text and images yourself.',
+    app: 'A custom tool, such as an order tracker or dashboard, built around how you work.',
+    ai: 'An AI-powered tool or feature, wrapped in a simple interface.',
+    improve: 'A review and upgrade of your current site: design, speed and fixes.',
+  };
+  const qs = [...quiz.querySelectorAll<HTMLFieldSetElement>('[data-q]')];
+  const stepEl = quiz.querySelector<HTMLElement>('[data-step]')!;
+  const result = quiz.querySelector<HTMLElement>('[data-result]')!;
+  let tally: Record<string, number> = {};
+  let idx = 0;
+  const show = () => {
+    qs.forEach((q, i) => (q.hidden = i !== idx));
+    stepEl.textContent = `Question ${idx + 1} of ${qs.length}`;
+    stepEl.hidden = false;
+  };
+  show();
+  qs.forEach((q) => q.querySelectorAll<HTMLButtonElement>('.opt').forEach((b) => b.addEventListener('click', () => {
+    (b.dataset.votes || '').split(',').filter(Boolean).forEach((v) => (tally[v] = (tally[v] || 0) + 1));
+    idx++;
+    if (idx < qs.length) { show(); qs[idx].querySelector<HTMLElement>('.opt')!.focus(); return; }
+    const best = order.reduce((a, c) => ((tally[c] || 0) > (tally[a] || 0) ? c : a), 'business');
+    qs.forEach((x) => (x.hidden = true)); stepEl.hidden = true;
+    quiz.querySelector('[data-result-name]')!.textContent = titles[best];
+    quiz.querySelector('[data-result-body]')!.textContent = blurbs[best];
+    result.hidden = false; result.focus();
+    result.dataset.best = best;
+  })));
+  quiz.querySelector('[data-result-go]')!.addEventListener('click', () => preselect(result.dataset.best!, map));
+  quiz.querySelector('[data-restart]')!.addEventListener('click', () => { tally = {}; idx = 0; result.hidden = true; show(); qs[0].querySelector<HTMLElement>('.opt')!.focus(); });
+</script>

@@ -1,0 +1,208 @@
+---
+import { Image } from 'astro:assets';
+import munshi from '../assets/projects/munshi.png';
+import { site } from '../data/site';
+import { industries } from '../data/content';
+import Icon from './Icon.astro';
+
+const { availability: av, contact } = site;
+const first = industries[0];
+---
+<section class="hero" id="top">
+  <div class="hero__orbs" aria-hidden="true"><i></i><i></i></div>
+  <div class="container hero__grid">
+    <div class="hero__copy">
+      {av.show && (
+        <p class="pill hero__in" style="--i:0">
+          <span class:list={['dot', { off: !av.available }]} aria-hidden="true"></span>
+          {av.available ? (
+            <span>Available for new projects{av.month && ` · ${av.month}`}</span>
+          ) : (
+            <span>Booked{av.bookedUntil && ` until ${av.bookedUntil}`} · <a href="#contact">join the waitlist</a></span>
+          )}
+          {contact.responseTime && <span class="pill__sep">Usually replies within {contact.responseTime}</span>}
+          {av.showClock && <span class="pill__sep" data-clock data-tz={site.timezone} hidden></span>}
+        </p>
+      )}
+      <p class="eyebrow hero__in" style="--i:0">Freelance web developer · {site.location}</p>
+      <h1 class="hero__in" style="--i:1">Your business deserves a <span class="grad">better website.</span></h1>
+      <p class="hero__lead hero__in" style="--i:2">
+        I design and build modern websites that make your business look professional, help customers find you, and make it easier to get in touch.
+      </p>
+      <div class="hero__cta hero__in" style="--i:3">
+        <a href="#contact" class="btn btn--primary" data-track="Hero CTA">Let’s Discuss Your Project <Icon name="arrow" class="arrow" /></a>
+        <a href="#work" class="btn">Explore My Work</a>
+        {site.booking && <button type="button" class="btn" data-book data-track="Booking click">{site.bookingLabel} <Icon name="calendar" /></button>}
+      </div>
+
+      <div class="try hero__in" style="--i:4">
+        <label for="biz-name">See your business here <span>Type your business name</span></label>
+        <input id="biz-name" type="text" maxlength="40" autocomplete="off" placeholder="e.g. Ahmed Bakery" data-biz-input />
+        <div class="chips" role="group" aria-label="Pick an industry for the preview">
+          {industries.map((ind, i) => (
+            <button type="button" class="chip" aria-pressed={i === 0 ? 'true' : 'false'} data-industry={ind.id}>
+              <Icon name={ind.icon} />{ind.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p class="hero__cred hero__in" style="--i:5">
+        I’m a working software engineer, experienced with CMS-powered sites and AI. You’ll deal directly with me, from first call to launch.
+      </p>
+    </div>
+
+    <div class="hero__visual hero__in" style="--i:2">
+      <div class="browser" role="img" aria-label="Live preview of a sample business website that updates with the name you type" style={`--accent:${first.accent}`} data-mini>
+        <div class="browser__bar" aria-hidden="true"><i></i><i></i><i></i><span data-mini-url>yourbusiness.com</span></div>
+        <div class="mini" aria-hidden="true">
+          <div class="mini__nav"><b><em data-mini-initial>Y</em><span data-mini-name>Your Business</span></b><span></span><span></span><span></span><u></u></div>
+          <div class="mini__hero">
+            <div>
+              <small data-mini-welcome>Welcome to Your Business</small>
+              <h4 data-mini-headline>{first.headline}</h4>
+              <u data-mini-cta>{first.cta}</u>
+            </div>
+            <div class="mini__img"></div>
+          </div>
+          <div class="mini__cards">{first.cards.map((c) => <div><span></span><p data-mini-card>{c}</p></div>)}</div>
+        </div>
+      </div>
+      <p class="browser__label">A quick preview. Your real site would be designed around your brand.</p>
+      <script type="application/json" data-industries set:html={JSON.stringify(industries)} />
+      <figure class="phone">
+        <Image src={munshi} alt="Munshi order management app on a phone" widths={[240, 320, 480]} sizes="(min-width: 960px) 200px, 34vw" loading="eager" />
+        <figcaption>Munshi, a real app I built</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero { padding-top: calc(var(--nav-h) + clamp(2rem, 6vw, 5rem)); padding-bottom: var(--s-section); position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(var(--c-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--c-grid-line) 1px, transparent 1px); background-size: 64px 64px; mask-image: radial-gradient(ellipse 70% 60% at 30% 30%, #000, transparent 75%); pointer-events: none; }
+  .hero__orbs { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .hero__orbs i { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.35; will-change: transform; animation: drift 22s ease-in-out infinite alternate; }
+  .hero__orbs i:first-child { width: 420px; height: 420px; left: -80px; top: 10%; background: #007fff; }
+  .hero__orbs i:last-child { width: 360px; height: 360px; right: -60px; top: 30%; background: var(--c-rose); animation-duration: 28s; animation-delay: -8s; opacity: 0.22; }
+  :global([data-theme='light']) .hero__orbs i { opacity: 0.16; }
+  @keyframes drift { to { transform: translate3d(60px, 40px, 0) scale(1.12); } }
+  @media (hover: none) { .hero__orbs i { animation-duration: 40s; } }
+
+  .hero__grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-8); align-items: center; }
+  .hero__grid > * { min-width: 0; }
+  .hero__copy { display: grid; gap: var(--s-5); justify-items: start; }
+  h1 { font-size: var(--t-hero); line-height: 0.98; letter-spacing: -0.035em; }
+  .hero__lead { font-size: var(--t-md); color: var(--c-text-2); max-width: 46ch; }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-2); }
+  .hero__cred { font-size: var(--t-sm); color: var(--c-text-3); padding-top: var(--s-4); border-top: 1px solid var(--c-border); max-width: 46ch; width: 100%; }
+
+  .pill { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); font-size: var(--t-xs); padding: 6px 14px; border: 1px solid var(--c-border-strong); border-radius: var(--r-pill); background: var(--c-surface-1); color: var(--c-text-2); }
+  .pill a { text-decoration: underline; color: var(--c-text); }
+  .pill__sep::before { content: '·'; margin-right: var(--s-3); color: var(--c-text-3); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-green-line); box-shadow: 0 0 0 0 var(--c-green-line); animation: ping 2.4s ease-out infinite; }
+  .dot.off { background: var(--c-text-3); animation: none; }
+  @keyframes ping { 0% { box-shadow: 0 0 0 0 #2fb67c88; } 80%, 100% { box-shadow: 0 0 0 8px #2fb67c00; } }
+
+  /* Transform-only entrance so text is never invisible */
+  .hero__in { animation: rise 0.55s var(--ease-out) both; animation-delay: calc(var(--i) * 60ms); }
+  @keyframes rise { from { transform: translateY(14px); } }
+
+  .try { display: grid; gap: var(--s-3); width: 100%; max-width: 30rem; padding: var(--s-4); border: 1px dashed var(--c-border-strong); border-radius: var(--r-md); background: var(--c-surface-1); }
+  .try label { font-size: var(--t-sm); font-weight: 600; display: grid; gap: 2px; }
+  .try label span { font-weight: 400; color: var(--c-text-3); font-size: var(--t-xs); }
+  .try input { width: 100%; min-height: 48px; padding: 0 var(--s-4); background: var(--c-bg); border: 1px solid var(--c-border-strong); border-radius: var(--r-sm); }
+  .try input:focus-visible { outline: none; border-color: var(--c-blue); box-shadow: 0 0 0 3px var(--c-blue-soft); }
+  .chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 var(--s-4); border: 1px solid var(--c-border-strong); border-radius: var(--r-pill); font-size: var(--t-sm); color: var(--c-text-2); transition: background-color var(--d-fast), border-color var(--d-fast), color var(--d-fast); }
+  .chip :global(svg) { width: 15px; height: 15px; }
+  .chip:hover { border-color: var(--c-text-3); color: var(--c-text); }
+  .chip[aria-pressed='true'] { background: var(--c-blue-soft); border-color: var(--c-blue); color: var(--c-text); }
+
+  .hero__visual { position: relative; padding: 0 0 var(--s-8); min-height: 360px; }
+  .browser { width: 90%; border: 1px solid var(--c-border-strong); border-radius: var(--r-md); background: var(--c-surface-1); box-shadow: 0 30px 60px -30px var(--c-shadow); overflow: hidden; position: relative; }
+  .browser__bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--c-border); background: var(--c-surface-2); }
+  .browser__bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--c-border-strong); }
+  .browser__bar span { margin-left: var(--s-3); font-family: var(--f-mono); font-size: 0.68rem; color: var(--c-text-3); background: var(--c-bg); padding: 3px 12px; border-radius: var(--r-pill); max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .browser__label { position: absolute; left: 0; bottom: 0; width: 52%; font-size: var(--t-xs); color: var(--c-text-3); line-height: 1.4; }
+
+  /* The sample site always renders as a bright, real-looking website */
+  .mini { --ink: #14181f; --muted: #5d6675; background: #fff; color: var(--ink); padding: var(--s-4); display: grid; gap: var(--s-4); min-height: 300px; font-family: var(--f-body); }
+  .mini__nav { display: flex; align-items: center; gap: 10px; }
+  .mini__nav b { display: inline-flex; align-items: center; gap: 8px; margin-right: auto; font-family: var(--f-display); font-size: 0.85rem; max-width: 55%; }
+  .mini__nav b span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mini__nav em { flex: none; width: 24px; height: 24px; border-radius: 7px; background: var(--accent); color: #fff; display: grid; place-items: center; font-style: normal; font-size: 0.75rem; transition: background-color var(--d-base); }
+  .mini__nav > span { width: 26px; height: 5px; border-radius: 3px; background: #d9dde4; }
+  .mini__nav u { width: 40px; height: 16px; border-radius: 4px; background: var(--accent); transition: background-color var(--d-base); }
+  .mini__hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--s-4); align-items: center; }
+  .mini small { font-size: 0.62rem; color: var(--accent); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; display: block; margin-bottom: 4px; transition: color var(--d-base); }
+  .mini h4 { font-family: var(--f-display); font-size: clamp(1.05rem, 0.9rem + 0.9vw, 1.6rem); line-height: 1.1; letter-spacing: -0.02em; color: var(--ink); margin-bottom: var(--s-3); text-wrap: balance; }
+  .mini__hero u { display: inline-block; text-decoration: none; background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 600; padding: 6px 12px; border-radius: 6px; transition: background-color var(--d-base); }
+  .mini__img { aspect-ratio: 4/3; border-radius: 10px; background: linear-gradient(135deg, var(--accent), #ffffff00 120%), linear-gradient(45deg, #1d2430, #3a4558); opacity: 0.95; transition: background var(--d-base); }
+  .mini__cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .mini__cards div { border: 1px solid #e3e6ec; border-radius: 8px; padding: 8px; display: grid; gap: 6px; }
+  .mini__cards span { width: 16px; height: 16px; border-radius: 5px; background: color-mix(in srgb, var(--accent) 22%, #fff); }
+  .mini__cards p { font-size: 0.66rem; font-weight: 600; color: var(--ink); }
+
+  .phone { position: absolute; right: 0; bottom: 0; width: min(40%, 210px); margin: 0; border-radius: 28px; border: 6px solid var(--c-bezel); background: var(--c-bezel); box-shadow: 0 40px 70px -30px #000, 0 0 0 1px var(--c-border-strong); overflow: hidden; transition: transform var(--d-slow) var(--ease-out); }
+  .phone :global(img) { width: 100%; height: auto; border-radius: 22px; }
+  .phone figcaption { position: absolute; inset: auto 0 0; padding: 22px 10px 8px; font-family: var(--f-mono); font-size: 0.6rem; text-align: center; color: #c9d0db; background: linear-gradient(transparent, #090b0fee); }
+  .hero__visual:hover .phone { transform: translateY(-6px); }
+
+  @media (min-width: 960px) {
+    .hero__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: var(--s-7); }
+    .hero__visual { min-height: 540px; }
+    .browser { width: 92%; }
+    .phone { width: 34%; }
+  }
+  @media (max-width: 480px) {
+    .mini__hero { grid-template-columns: 1fr; }
+    .mini__img { display: none; }
+    .mini { min-height: 220px; }
+    .hero__cta .btn { width: 100%; }
+    .phone { width: 36%; }
+  }
+  @media (prefers-reduced-motion: reduce) { .hero__orbs i, .dot { animation: none; } }
+</style>
+
+<script>
+  type Ind = { id: string; icon: string; accent: string; headline: string; cta: string; cards: string[] };
+  const root = document.querySelector<HTMLElement>('[data-mini]')!;
+  const inds: Ind[] = JSON.parse(document.querySelector('[data-industries]')!.textContent!);
+  const input = document.querySelector<HTMLInputElement>('[data-biz-input]')!;
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('[data-industry]')];
+  const q = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+  let current = inds[0];
+
+  const render = () => {
+    const name = input.value.trim();
+    const shown = name || 'Your Business';
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 24) || 'yourbusiness';
+    q('[data-mini-url]').textContent = `${slug}.com`;
+    q('[data-mini-name]').textContent = shown;
+    q('[data-mini-initial]').textContent = shown[0].toUpperCase();
+    q('[data-mini-welcome]').textContent = `Welcome to ${shown}`;
+    q('[data-mini-headline]').textContent = current.headline;
+    q('[data-mini-cta]').textContent = current.cta;
+    root.querySelectorAll('[data-mini-card]').forEach((el, i) => (el.textContent = current.cards[i]));
+    root.style.setProperty('--accent', current.accent);
+    (window as any).__bizName = name;
+    document.dispatchEvent(new CustomEvent('bizname', { detail: name }));
+  };
+
+  let t: number;
+  input.addEventListener('input', () => { clearTimeout(t); t = window.setTimeout(render, 150); });
+  chips.forEach((c) => c.addEventListener('click', () => {
+    current = inds.find((i) => i.id === c.dataset.industry)!;
+    chips.forEach((o) => o.setAttribute('aria-pressed', String(o === c)));
+    render();
+  }));
+
+  // Lahore clock (progressive enhancement; the rest of the pill is server-rendered)
+  const clock = document.querySelector<HTMLElement>('[data-clock]');
+  if (clock) {
+    const fmt = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone: clock.dataset.tz });
+    const tick = () => { clock.textContent = `It’s ${fmt.format(new Date()).toLowerCase()} for me now`; };
+    tick(); clock.hidden = false; setInterval(tick, 30000);
+  }
+</script>

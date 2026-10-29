@@ -1,0 +1,123 @@
+---
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+const { packages, currencies, estimator } = site;
+const priced = packages.some((p) => p.from > 0);
+const usable = currencies.list.filter((c) => c.rate > 0);
+const showSwitch = priced && usable.length > 1;
+const est = estimator.basePrice > 0 || estimator.perPage > 0;
+---
+<section class="section" id="packages" aria-labelledby="pk-h">
+  <div class="container" data-packages data-currencies={JSON.stringify(currencies.list)} data-default={currencies.default}>
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Packages</p>
+      <h2 id="pk-h">Clear starting points, a clear quote.</h2>
+      <p>{priced ? 'Prices are starting points. The final quote depends on what you need.' : 'Every project is different. Tell me what you need and I’ll give you a clear quote after we talk.'}</p>
+    </div>
+
+    {showSwitch && (
+      <div class="cur" role="group" aria-label="Currency">
+        {usable.map((c) => <button type="button" class="chip" aria-pressed={c.code === currencies.default ? 'true' : 'false'} data-cur={c.code}>{c.code}</button>)}
+      </div>
+    )}
+
+    <ul class="tiers">
+      {packages.map((p, i) => (
+        <li class:list={['tier', { featured: p.featured }]} data-reveal style={`--delay:${i * 60}ms`}>
+          {p.featured && <span class="badge">Most requested</span>}
+          <h3>{p.name}</h3>
+          <p class="for">{p.forWho}</p>
+          <p class="price" data-from={p.from}>
+            {p.from > 0 ? (<><small>Starting from</small> <strong data-price>PKR {p.from.toLocaleString('en-US')}</strong></>) : <strong>Get a quote</strong>}
+          </p>
+          <p class="time">{p.timeline ? `Typical timeline: ${p.timeline}` : 'Timeline agreed after we talk'}</p>
+          <ul class="inc">{p.includes.map((x) => <li><Icon name="check" />{x}</li>)}</ul>
+          <a href="#contact" class="btn" data-package-service={p.service}>Ask about this <Icon name="arrow" class="arrow" /></a>
+        </li>
+      ))}
+    </ul>
+
+    {est && (
+      <form class="est" data-est data-base={estimator.basePrice} data-page={estimator.perPage} data-cms={estimator.cms} data-spread={estimator.spread} onsubmit="return false">
+        <h3>Rough estimate</h3>
+        <div class="est__row">
+          <label for="est-pages">Pages</label>
+          <input id="est-pages" type="number" min="1" max="30" value="5" inputmode="numeric" />
+        </div>
+        {estimator.cms > 0 && <label class="check"><input type="checkbox" data-est-cms /> Edit content myself (CMS)</label>}
+        {estimator.extras.map((x) => <label class="check"><input type="checkbox" data-est-extra={x.price} /> {x.label}</label>)}
+        <p class="est__out" role="status" aria-live="polite"><span data-est-range></span></p>
+        <p class="est__note">Estimate only. Final quote after we talk.</p>
+      </form>
+    )}
+  </div>
+</section>
+
+<style>
+  .cur { display: flex; gap: var(--s-2); margin-bottom: var(--s-6); }
+  .chip { min-height: 44px; min-width: 64px; padding: 0 var(--s-4); border: 1px solid var(--c-border-strong); border-radius: var(--r-pill); font-size: var(--t-sm); color: var(--c-text-2); }
+  .chip[aria-pressed='true'] { background: var(--c-blue-soft); border-color: var(--c-blue); color: var(--c-text); }
+  .tiers { display: grid; gap: var(--s-4); align-items: stretch; }
+  .tier { position: relative; display: grid; gap: var(--s-3); align-content: start; padding: var(--s-6) var(--s-5); border: 1px solid var(--c-border); border-radius: var(--r-md); background: var(--c-surface-1); }
+  .tier.featured { border-color: var(--c-blue); background: linear-gradient(160deg, var(--c-blue-soft), transparent 50%), var(--c-surface-1); }
+  .badge { position: absolute; top: -12px; left: var(--s-5); font-family: var(--f-mono); font-size: var(--t-xs); background: var(--c-blue-fill); color: var(--c-on-fill); padding: 3px 12px; border-radius: var(--r-pill); }
+  h3 { font-size: var(--t-xl); }
+  .for { color: var(--c-text-2); font-size: var(--t-sm); min-height: 3em; }
+  .price { padding-block: var(--s-3); border-block: 1px solid var(--c-border); }
+  .price small { display: block; font-size: var(--t-xs); color: var(--c-text-3); font-family: var(--f-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+  .price strong { font-family: var(--f-display); font-size: var(--t-lg); letter-spacing: -0.02em; }
+  .time { font-size: var(--t-sm); color: var(--c-text-3); }
+  .inc { display: grid; gap: var(--s-2); margin-block: var(--s-2) var(--s-4); font-size: var(--t-sm); color: var(--c-text-2); }
+  .inc li { display: flex; gap: var(--s-2); align-items: flex-start; }
+  .inc :global(svg) { flex: none; width: 16px; height: 16px; margin-top: 4px; color: var(--c-blue); }
+  .tier .btn { align-self: end; }
+  .est { margin-top: var(--s-7); display: grid; gap: var(--s-4); padding: var(--s-5); border: 1px solid var(--c-border); border-radius: var(--r-md); background: var(--c-surface-1); max-width: 34rem; }
+  .est h3 { font-size: var(--t-lg); }
+  .est__row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); }
+  .est input[type='number'] { width: 6rem; min-height: 44px; padding: 0 var(--s-3); background: var(--c-bg); border: 1px solid var(--c-border-strong); border-radius: var(--r-sm); }
+  .check { display: flex; gap: var(--s-3); align-items: center; min-height: 44px; font-size: var(--t-sm); }
+  .check input { width: 20px; height: 20px; accent-color: var(--c-blue-fill); }
+  .est__out { font-family: var(--f-display); font-size: var(--t-xl); letter-spacing: -0.02em; }
+  .est__note { font-size: var(--t-xs); color: var(--c-text-3); }
+  @media (min-width: 900px) { .tiers { grid-template-columns: repeat(3, 1fr); } }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-packages]')!;
+  const list: { code: string; symbol: string; rate: number }[] = JSON.parse(root.dataset.currencies!);
+  const fmt = (pkr: number, code: string) => {
+    const c = list.find((x) => x.code === code && x.rate > 0) ?? list[0];
+    const v = Math.round((pkr * c.rate) / (c.rate === 1 ? 1000 : 10)) * (c.rate === 1 ? 1000 : 10);
+    return `${c.symbol}${v.toLocaleString('en-US')}`;
+  };
+  const current = () => document.documentElement.dataset.currency || root.dataset.default!;
+  const render = () => {
+    const code = current();
+    root.querySelectorAll<HTMLElement>('[data-from]').forEach((el) => {
+      const from = Number(el.dataset.from); const out = el.querySelector('[data-price]');
+      if (from > 0 && out) out.textContent = fmt(from, code);
+    });
+    root.querySelectorAll<HTMLElement>('[data-cur]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cur === code)));
+    est();
+  };
+  root.querySelectorAll<HTMLElement>('[data-cur]').forEach((b) => b.addEventListener('click', () => (window as any).setCurrency(b.dataset.cur)));
+  document.addEventListener('currencychange', render);
+
+  root.querySelectorAll<HTMLElement>('[data-package-service]').forEach((a) => a.addEventListener('click', () => {
+    (window as any).__service = a.dataset.packageService;
+    document.dispatchEvent(new CustomEvent('preselect', { detail: a.dataset.packageService }));
+  }));
+
+  const form = root.querySelector<HTMLElement>('[data-est]');
+  function est() {
+    if (!form) return;
+    const pages = Math.max(1, Math.min(30, Number((form.querySelector('#est-pages') as HTMLInputElement).value) || 1));
+    let total = Number(form.dataset.base) + pages * Number(form.dataset.page);
+    if ((form.querySelector('[data-est-cms]') as HTMLInputElement | null)?.checked) total += Number(form.dataset.cms);
+    form.querySelectorAll<HTMLInputElement>('[data-est-extra]').forEach((x) => { if (x.checked) total += Number(x.dataset.estExtra); });
+    const s = Number(form.dataset.spread);
+    form.querySelector('[data-est-range]')!.textContent = `${fmt(total * (1 - s), current())} – ${fmt(total * (1 + s), current())}`;
+  }
+  form?.addEventListener('input', est);
+  render();
+</script>
