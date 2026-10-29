@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://sohaibhaseeb7759.github.io/portfolio/sitemap-index.xml
