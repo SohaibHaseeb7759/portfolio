@@ -31,7 +31,7 @@ The email, phone and social links were taken from your existing portfolio. Chang
 
 1. Put the image in `src/assets/projects/`.
 2. In `src/data/content.ts`, import it and set `image` (and optionally `image2`) and `imageAlt` on the project.
-3. Set `live` (and `liveLabel`) only if a public URL exists. A project without `live` shows no demo button. `kind` must honestly be one of: Live product, Client website (team work), Personal project, Academic project.
+3. Set `live` (and `liveLabel`) only if a public URL exists. A project without `live` shows no demo button. `kind` must honestly be one of: Live product, Client website, Personal project, Academic project.
 
 Projects without an image show a clearly labelled "Screenshot coming soon" placeholder.
 

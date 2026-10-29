@@ -75,7 +75,7 @@ export type Project = {
   /** Tall full-page screenshot for scroll-in-frame. Falls back to `image`. */
   imageFull?: ImageMetadata;
   name: string;
-  kind: 'Live product' | 'Client website (team work)' | 'Personal project' | 'Academic project';
+  kind: 'Live product' | 'Client website' | 'Personal project' | 'Academic project';
   year: string;
   summary: string;
   forWho: string;
@@ -97,7 +97,7 @@ export type Project = {
 };
 
 const CR =
-  'Company product. The product, its name and its content are the property and copyright of its owner. I built parts of it as a developer; I don\'t own it.';
+  'Company product. The product, its name and its content are the property and copyright of its owner. I was its developer; I don\'t own it.';
 
 export const projects: Project[] = [
   {
@@ -125,12 +125,12 @@ export const projects: Project[] = [
     imageFull: rocketFull,
     category: 'websites',
     name: 'RocketMSL',
-    kind: 'Client website (team work)',
+    kind: 'Client website',
     year: '2026',
     summary: 'A website for a platform that helps pharmaceutical Medical Affairs teams measure the quality of their conversations with doctors.',
     forWho: 'Medical Affairs teams who want evidence of how well their field conversations are going.',
     problem: 'A technical product needs a site that explains it clearly to a specialist audience, and looks credible doing it.',
-    contribution: 'Built as part of my role at Transcure. I developed reusable page components.',
+    contribution: 'I was the only developer on this project, working at Transcure. I built the website pages and reusable components.',
     features: ['Clear explanation of the platform', 'Consistent reusable components', 'Responsive layout for desktop and mobile'],
     tech: ['Astro', 'Tailwind'],
     image: rocketmsl,
@@ -146,12 +146,12 @@ export const projects: Project[] = [
     imageFull: macraFull,
     category: 'websites',
     name: 'Macralytics',
-    kind: 'Client website (team work)',
+    kind: 'Client website',
     year: '2026',
     summary: 'A website for a medical billing and reporting company that helps healthcare practices with Medicare MIPS reporting.',
     forWho: 'Clinicians and practice managers looking for help with MIPS reporting.',
     problem: 'Practices need to understand the service quickly and be able to request a consultation.',
-    contribution: 'Built as part of my role at Transcure. I worked on connecting the site with WordPress.',
+    contribution: 'I was the only developer on this project, working at Transcure. I built the site and connected it with WordPress.',
     features: ['Consultation request form above the fold', 'Content that can be managed through WordPress', 'Responsive layout for desktop and mobile'],
     tech: ['WordPress', 'JavaScript'],
     image: macralytics,
@@ -168,12 +168,12 @@ export const projects: Project[] = [
     category: 'websites',
     outcome: 'Venue staff can update the website’s pages themselves through a content system.',
     name: 'Altitude Arena',
-    kind: 'Client website (team work)',
+    kind: 'Client website',
     year: '2026',
     summary: 'A website for an indoor entertainment venue in Sharjah, UAE, covering activities, birthdays, offers and online booking.',
     forWho: 'Families and groups deciding where to go, and venue staff who need to keep pages up to date.',
     problem: 'Visitors need to see what the venue offers and book quickly, and staff need to change content without a developer.',
-    contribution: 'Built as part of my role at Transcure. I developed the front end, the content-system connection and a mailing-list sign-up.',
+    contribution: 'I was the only developer on this project, working at Transcure. I built the front end, the content-system connection and the mailing-list sign-up.',
     features: ['Pages editable through a content system', 'Fallback content if the system is unreachable', 'Mailing-list sign-up integration'],
     tech: ['Astro', 'Tailwind', 'Payload CMS', 'MongoDB'],
     image: arena,
@@ -190,12 +190,12 @@ export const projects: Project[] = [
     category: 'websites',
     outcome: 'Venue staff can update the website’s pages themselves through a content system.',
     name: 'Altitude Trampoline Park',
-    kind: 'Client website (team work)',
+    kind: 'Client website',
     year: '2026',
     summary: 'A website for an indoor trampoline park in Sharjah, UAE, covering attractions, birthdays, events and memberships.',
     forWho: 'Families planning a visit or a party, and venue staff who manage the content.',
     problem: 'Parents want clear information on attractions, parties and passes, and the venue team needs an easy way to update it.',
-    contribution: 'Built as part of my role at Transcure. I developed the front end and content-system connection.',
+    contribution: 'I was the only developer on this project, working at Transcure. I built the front end and the content-system connection.',
     features: ['Pages editable through a content system', 'Fallback content if the system is unreachable', 'Responsive layout for desktop and mobile'],
     tech: ['Astro', 'Tailwind', 'Payload CMS', 'MongoDB'],
     image: trampoline,
@@ -210,8 +210,8 @@ export const projects: Project[] = [
 
 /** Smaller entries shown in the "More projects" list. `href` is optional. */
 export const alsoBuilt: readonly { name: string; note: string; href?: string; tag: string; category: 'websites' | 'apps' | 'ai' }[] = [
-  { category: 'websites', name: 'VizCraft', href: 'https://vizcraft.biz/', tag: 'Live website', note: 'Reusable components (Transcure). Company product.' },
-  { category: 'websites', name: 'Emprofy', href: 'https://emprofy.com/', tag: 'Live website', note: 'Marketing website (Purevi Tech Solutions). Company product.' },
+  { category: 'websites', name: 'VizCraft', href: 'https://vizcraft.biz/', tag: 'Live website', note: 'Built by me at Transcure. Company product.' },
+  { category: 'websites', name: 'Emprofy', href: 'https://emprofy.com/', tag: 'Live website', note: 'Marketing website built by me at Purevi Tech Solutions. Company product.' },
   { category: 'ai', name: 'Train Detector', href: 'https://github.com/SohaibHaseeb7759/Train-Detector-Model', tag: 'AI · Personal project', note: 'Detects trains in images with a custom-trained model and reads locomotive IDs. Source on GitHub.' },
   { category: 'ai', name: 'Voice Recognition', tag: 'AI · Personal project', note: 'Desktop speech-to-text app built on OpenAI Whisper, with model fine-tuning and accuracy testing. Private repository.' },
   { category: 'apps', name: 'BidMuse', tag: 'Academic project', note: 'Online auction platform with 3D item viewing and bidding. Final-year project, no public demo.' },

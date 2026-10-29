@@ -101,7 +101,7 @@ export const site = {
    */
   highlights: [] as { value: number; suffix?: string; label: string }[],
 
-  /** Employers / teams shown as "Experience at" (these are NOT clients). Add `logo` only with permission. */
+  /** Employers shown as "Experience at" (these are NOT clients). Add `logo` only with permission. */
   experience: [
     { name: 'Transcure' },
     { name: 'Purevi Tech Solutions' },
